@@ -21,6 +21,7 @@ int main() {
     cout << "(Game created by Alex Samuel) \n";
     cout << "Press Enter to Continue:";
     cin.get();
+    cout.flush();
     bool inputError = false;
     do {
         cout << "Player select required \n";
@@ -33,9 +34,11 @@ int main() {
             inputError = false;
         } else {
             inputError = true;
-            cout << "Invalid input, please enter 1 (Yes) or 2 (No) \n";
+            cout << "Invalid input, please enter 1 (Yes) or 2 (No)\n";
+            cout << "Press Enter to continue...";
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cin.get();
         }
     } while (inputError);
     return 0;
