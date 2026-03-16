@@ -6,6 +6,7 @@
  *@author Alex Samuel
 */
 #include <iostream>
+#include <limits>
 using namespace std;
 
 /**
@@ -22,19 +23,20 @@ int main() {
     cin.get();
     bool inputError = false;
     do {
-        cout << "Player select required";
-        cout << "Would you like to play against the computer?";
-        cout << "1. Yes \n2. No";
+        cout << "Player select required \n";
+        cout << "Would you like to play against the computer? \n";
+        cout << "1. Yes \n2. No \n";
         cout << "Enter your choice: ";
         int choice;
         cin >> choice;
-        cin.ignore();
         if (choice == 1 || choice == 2) {
             inputError = false;
         } else {
             inputError = true;
+            cout << "Invalid input, please enter 1 (Yes) or 2 (No) \n";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }
-
-    } while (inputError != true);
+    } while (inputError);
     return 0;
 }
