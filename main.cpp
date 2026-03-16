@@ -8,6 +8,13 @@
 */
 #include <iostream>
 using namespace std;
+
+/**
+ * The main program which runs the battleship program
+ * Creates a list of user prompts.
+ * Player selection is here.
+ * @return 0
+ */
 int main() {
     cout << "Welcome to Battleships ! \n";
     cout << "Game created by Alex Samuel";
