@@ -8,6 +8,7 @@
 #include <iostream>
 #include <limits>
 using namespace std;
+const int GRID_SIZE = 10;
 
 /**
  * The main program which runs the battleship program
@@ -30,8 +31,23 @@ int main() {
         cout << "Enter your choice: ";
         int choice;
         cin >> choice;
-        if (choice == 1 || choice == 2) {
+        if (choice == 1) {
             inputError = false;
+        } else if (choice == 2) {
+            inputError = false;
+            cout << "Player 1 assign ships (10 * 10 grid)";
+            char gameGrid [GRID_SIZE][GRID_SIZE];
+            for (auto & row : gameGrid) {
+                for (char & col : row) {
+                    col = '~';
+                }
+            }
+            for (auto & row : gameGrid) {
+                for (const char col : row) {
+                    cout << col << " ";
+                }
+                cout << endl;
+            }
         } else {
             inputError = true;
             cout << "Invalid input, please enter 1 (Yes) or 2 (No)\n";
