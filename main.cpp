@@ -4,7 +4,6 @@
  *This version is the simplest version of the game
  *@version 1.0
  *@author Alex Samuel
- *@class main
 */
 #include <iostream>
 using namespace std;
