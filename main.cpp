@@ -16,7 +16,26 @@ using namespace std;
  * @return 0
  */
 int main() {
-    cout << "Welcome to Battleships ! \n";
-    cout << "Game created by Alex Samuel";
+
+    cout << "Welcome to Battleships !";
+    cout << "(Game created by Alex Samuel) \n";
+    cout << "Press Enter to Continue:";
+    cin.get();
+    bool inputError = false;
+    do {
+        cout << "Player select required";
+        cout << "Would you like to play against the computer?";
+        cout << "1. Yes \n2. No";
+        cout << "Enter your choice: ";
+        int choice;
+        cin >> choice;
+        cin.ignore();
+        if (choice == 1 || choice == 2) {
+            inputError = false;
+        } else {
+            inputError = true;
+        }
+
+    } while (inputError != true);
+    return 0;
 }
-// TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
