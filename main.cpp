@@ -11,6 +11,35 @@ using namespace std;
 constexpr int GRID_SIZE = 10;
 
 /**
+ *Checks whether the user has entered the correct row
+ * @param row the row number
+ * @return whether the row is valid (true or false).
+ */
+bool isValidRow(int row) {
+    return row >= 1 && row <= GRID_SIZE;
+}
+
+/**
+ * Checks whether the user has entered the correct column
+ * @param col the column letter
+ * @return whether the column is valid (true or false).
+ */
+bool isValidCol(char col) {
+    col = toupper(col);
+    return col >= 'A' && col <= 'J';
+}
+
+/**
+ *
+ * @param col the column number
+ * @param row the row letter
+ * @return whether the coordinate is valid or not.
+ */
+bool isValidCoordinate(char col, int row) {
+    return isValidRow(row) && isValidCol(col);
+}
+
+/**
  * The main program which runs the battleship program
  * Creates a list of user prompts.
  * Player selection is here.
@@ -48,25 +77,27 @@ int main() {
                 }
                 cout << endl;
             }
-            cout << "Assign Your carrier(5) \n";
-            int rowError = true;
-            while (rowError) {
+            bool coordinateError = true;
+            while (coordinateError) {
+                cout << "Enter the start coordinates of the carrier(5): ";
+                char col;
                 int row;
-                cout << "Enter the row number: ";
-                cin >> row;
-                if (row == 1 |row == 2 | row == 3 | row == 4 | row == 5
-                    | row == 6 | row == 7 | row == 8 | row == 9 | row == 10) {
-                    rowError = false;
-                } else {
-                    rowError = true;
-                    cout << "Invalid input, please enter a number between 1 and 10\n";
+                cin >> col >> row;
+                if (isValidCoordinate(col, row)) {
+                    gameGrid[row][col] = 'C';
+                    coordinateError = false;
+
+                }
+                else {
+                    cout << "Invalid coordinates, please try again\n";
                     cout << "Press Enter to continue...";
                     cin.clear();
                     cin.ignore(numeric_limits<streamsize>::max(), '\n');
                     cin.get();
+                    coordinateError = true;
                 }
+
             }
-            cout << "Enter the column letter: ";
         } else {
             inputError = true;
             cout << "Invalid input, please enter 1 (Yes) or 2 (No)\n";
