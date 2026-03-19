@@ -200,7 +200,8 @@ void assignShip(char gameGrid[GRID_SIZE][GRID_SIZE], const string& shipName, int
  *@param gameGrid the game grid of the player
 */
 
-void assignShipPrompts (int playerNum, char gameGrid[GRID_SIZE][GRID_SIZE]) {
+void assignShipPrompts (const int playerNum, char gameGrid[GRID_SIZE][GRID_SIZE]) {
+    displayGrid(gameGrid);
     cout << playerNum << " - assign your ships\n";
     assignShip(gameGrid, "Carrier",    5, 'C');
     assignShip(gameGrid, "Battleship", 4, 'B');
