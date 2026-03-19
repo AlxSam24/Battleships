@@ -194,6 +194,24 @@ void assignShip(char gameGrid[GRID_SIZE][GRID_SIZE], const string& shipName, int
 }
 
 /**
+ *This method is used to stop repeated code and improve the readability of the code.
+ *The returned grid of the player
+ *@param playerNum the player number
+ *@param gameGrid the game grid of the player
+*/
+
+void assignShipPrompts (int playerNum, char gameGrid[GRID_SIZE][GRID_SIZE]) {
+    cout << playerNum << " - assign your ships\n";
+    assignShip(gameGrid, "Carrier",    5, 'C');
+    assignShip(gameGrid, "Battleship", 4, 'B');
+    assignShip(gameGrid, "Cruiser",    3, 'R');
+    assignShip(gameGrid, "Submarine",  3, 'S');
+    assignShip(gameGrid, "Destroyer",  2, 'D');
+    cout << "\nAll ships placed. Player 1 Ready to play!\n";
+    displayGrid(gameGrid);
+}
+
+/**
  * The main program which runs the battleship program.
  * Creates a list of user prompts.
  * Player selection is here.
