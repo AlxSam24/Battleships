@@ -199,6 +199,7 @@ void assignShip(char gameGrid[GRID_SIZE][GRID_SIZE], const string& shipName, int
  * Player selection is here.
  * @return 0
  */
+
 int main() {
     cout << "Welcome to Battleships!\n";
     cout << "(Game created by Alex Samuel)\n";
@@ -240,8 +241,8 @@ int main() {
             assignShip(gameGrid, "Cruiser",    3, 'R');
             assignShip(gameGrid, "Submarine",  3, 'S');
             assignShip(gameGrid, "Destroyer",  2, 'D');
-
-            cout << "\nAll ships placed. Ready to play!\n";
+            cout << "\nAll ships placed. Player 1 Ready to play!\n";
+            displayGrid(gameGrid);
 
         } else {
             inputError = true;
