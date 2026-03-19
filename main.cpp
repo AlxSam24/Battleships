@@ -244,6 +244,16 @@ int main() {
             cout << "\nAll ships placed. Player 1 Ready to play!\n";
             displayGrid(gameGrid);
 
+            cout << "\nPlayer 2 - assign your ships\n";
+            displayGrid(gameGrid);
+            assignShip(gameGrid, "Carrier",    5, 'C');
+            assignShip(gameGrid, "Battleship", 4, 'B');
+            assignShip(gameGrid, "Cruiser",    3, 'R');
+            assignShip(gameGrid, "Submarine",  3, 'S');
+            assignShip(gameGrid, "Destroyer",  2, 'D');
+            cout << "\nAll ships placed. Player 2 Ready to play!\n";
+            displayGrid(gameGrid);
+
         } else {
             inputError = true;
             cout << "Invalid input, please enter 1 (Yes) or 2 (No)\n";
