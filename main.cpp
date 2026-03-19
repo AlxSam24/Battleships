@@ -252,26 +252,8 @@ int main() {
                 for (char& cell : row)
                     cell = '~';
 
-            cout << "\nPlayer 1 - assign your ships\n";
-            displayGrid(gameGrid);
-
-            assignShip(gameGrid, "Carrier",    5, 'C');
-            assignShip(gameGrid, "Battleship", 4, 'B');
-            assignShip(gameGrid, "Cruiser",    3, 'R');
-            assignShip(gameGrid, "Submarine",  3, 'S');
-            assignShip(gameGrid, "Destroyer",  2, 'D');
-            cout << "\nAll ships placed. Player 1 Ready to play!\n";
-            displayGrid(gameGrid);
-
-            cout << "\nPlayer 2 - assign your ships\n";
-            displayGrid(gameGrid);
-            assignShip(gameGrid, "Carrier",    5, 'C');
-            assignShip(gameGrid, "Battleship", 4, 'B');
-            assignShip(gameGrid, "Cruiser",    3, 'R');
-            assignShip(gameGrid, "Submarine",  3, 'S');
-            assignShip(gameGrid, "Destroyer",  2, 'D');
-            cout << "\nAll ships placed. Player 2 Ready to play!\n";
-            displayGrid(gameGrid);
+            assignShipPrompts(1, gameGrid);
+            assignShipPrompts(2, gameGrid);
 
         } else {
             inputError = true;
