@@ -17,6 +17,7 @@ constexpr int GRID_SIZE = 10;
  * @param row the row number
  * @return true if valid, false otherwise
  */
+
 bool isValidRow(int row) {
     return row >= 1 && row <= GRID_SIZE;
 }
@@ -26,6 +27,7 @@ bool isValidRow(int row) {
  * @param col the column letter
  * @return true if valid, false otherwise
  */
+
 bool isValidCol(char col) {
     col = static_cast<char>(toupper(col));
     return col >= 'A' && col <= 'J';
@@ -37,6 +39,7 @@ bool isValidCol(char col) {
  * @param row the row number
  * @return true if valid, false otherwise
  */
+
 bool isValidCoordinate(char col, int row) {
     return isValidRow(row) && isValidCol(col);
 }
@@ -50,6 +53,7 @@ bool isValidCoordinate(char col, int row) {
  * @param horizontal true = horizontal, false = vertical
  * @return true if the ship fits within the grid
  */
+
 bool shipFits(char col, int row, int size, bool horizontal) {
     col = static_cast<char>(toupper(col));
     if (horizontal) {
@@ -125,6 +129,18 @@ void displayGrid(char gameGrid[GRID_SIZE][GRID_SIZE]) {
 }
 
 /**
+ *Display the intial grid of the player before player has assigned their ships.
+ *@param gameGrid the player map
+ */
+void displayEmptyGrid(char gameGrid[GRID_SIZE][GRID_SIZE]) {
+    for (int r = 0; r < GRID_SIZE; r++) {
+        for (int c = 0; c < GRID_SIZE; c++) {
+            gameGrid[r][c] = '~';
+        }
+    }
+}
+
+/**
  * Prompts the player to place a single ship on the grid.
  * Validates start coordinate, orientation, fit, and overlap.
  * Automatically calculates and displays the end coordinate.
@@ -133,6 +149,7 @@ void displayGrid(char gameGrid[GRID_SIZE][GRID_SIZE]) {
  * @param size      length of the ship
  * @param symbol    character to mark the ship with
  */
+
 void assignShip(char gameGrid[GRID_SIZE][GRID_SIZE], const string& shipName, int size, char symbol) {
     cout << "\nAssign your " << shipName << " (size " << size << ")\n";
 
@@ -201,8 +218,8 @@ void assignShip(char gameGrid[GRID_SIZE][GRID_SIZE], const string& shipName, int
 */
 
 void assignShipPrompts (const int playerNum, char gameGrid[GRID_SIZE][GRID_SIZE]) {
+    cout << "Player " << playerNum << " - assign your ships\n";
     displayGrid(gameGrid);
-    cout << playerNum << " - assign your ships\n";
     assignShip(gameGrid, "Carrier",    5, 'C');
     assignShip(gameGrid, "Battleship", 4, 'B');
     assignShip(gameGrid, "Cruiser",    3, 'R');
@@ -218,7 +235,6 @@ void assignShipPrompts (const int playerNum, char gameGrid[GRID_SIZE][GRID_SIZE]
  * Player selection is here.
  * @return 0
  */
-
 int main() {
     cout << "Welcome to Battleships!\n";
     cout << "(Game created by Alex Samuel)\n";
@@ -247,13 +263,13 @@ int main() {
         } else if (choice == 2) {
             inputError = false;
 
-            char gameGrid[GRID_SIZE][GRID_SIZE];
-            for (auto& row : gameGrid)
-                for (char& cell : row)
-                    cell = '~';
+            char gameGridPlayerOne[GRID_SIZE][GRID_SIZE];
+            displayEmptyGrid(gameGridPlayerOne);
+            assignShipPrompts(1, gameGridPlayerOne);
 
-            assignShipPrompts(1, gameGrid);
-            assignShipPrompts(2, gameGrid);
+            char gameGridPlayerTwo[GRID_SIZE][GRID_SIZE];
+            displayEmptyGrid(gameGridPlayerTwo);
+            assignShipPrompts(2, gameGridPlayerTwo);
 
         } else {
             inputError = true;
