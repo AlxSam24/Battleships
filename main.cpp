@@ -8,6 +8,10 @@
 #include <iostream>
 #include <limits>
 #include <string>
+#include <random>
+#include <chrono>
+#include <thread>
+
 using namespace std;
 
 constexpr int GRID_SIZE = 10;
@@ -225,8 +229,43 @@ void assignShipPrompts (const int playerNum, char gameGrid[GRID_SIZE][GRID_SIZE]
     assignShip(gameGrid, "Cruiser",    3, 'R');
     assignShip(gameGrid, "Submarine",  3, 'S');
     assignShip(gameGrid, "Destroyer",  2, 'D');
-    cout << "\nAll ships placed. Player 1 Ready to play!\n";
+    cout << "\nAll ships placed. Player "<< playerNum << " Ready to play!\n";
     displayGrid(gameGrid);
+}
+/**
+ *Function to check who goes first by randomly selecting 1 or 2
+ */
+
+int whoGoesFirst() {
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> dist(1, 2);
+    return dist(gen);
+}
+
+/**
+ *Typewrite method to type messages to the user for effect
+ * @param message The message being displayed
+ * @param delayMs The delay for writing the message. Set at 30 but can be slower if needs be.
+ */
+void typewrite(const string& message, int delayMs = 30) {
+    for (char c : message) {
+        cout << c << flush;
+        this_thread::sleep_for(chrono::milliseconds(delayMs));
+    }
+    cout << "\n";
+}
+
+/**
+ * Method to display enter to continue prompt (as this is used a lot in the program)
+ * @param delayMs typewriter delay
+ */
+
+void enterToContinue(int delayMs) {
+    typewrite( "Press Enter to continue...",delayMs);
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cin.get();
 }
 
 /**
@@ -236,24 +275,24 @@ void assignShipPrompts (const int playerNum, char gameGrid[GRID_SIZE][GRID_SIZE]
  * @return 0
  */
 int main() {
-    cout << "Welcome to Battleships!\n";
-    cout << "(Game created by Alex Samuel)\n";
-    cout << "Press Enter to continue:";
+    typewrite("Welcome to Battleships!\n",20);
+    typewrite("(Game created by Alex Samuel)\n",20);
+    typewrite("Press Enter to continue...",10);
     cin.get();
 
     bool inputError = false;
     do {
-        cout << "\nPlayer select required\n";
-        cout << "Would you like to play against the computer?\n";
-        cout << "1. Yes\n2. No\n";
-        cout << "Enter your choice: ";
+        typewrite("\nPlayer select required\n",5);
+        typewrite("Would you like to play against the computer?\n",5);
+        typewrite("1. Yes\n2. No\n",5);
+        typewrite("Enter your choice: ",5);
 
         int choice;
         cin >> choice;
 
         if (cin.fail()) {
             inputError = true;
-            cout << "Invalid input, please enter 1 (Yes) or 2 (No)\n";
+            typewrite("Invalid input, please enter 1 (Yes) or 2 (No)\n",10);
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
         } else if (choice == 1) {
@@ -266,10 +305,21 @@ int main() {
             char gameGridPlayerOne[GRID_SIZE][GRID_SIZE];
             displayEmptyGrid(gameGridPlayerOne);
             assignShipPrompts(1, gameGridPlayerOne);
+            typewrite("Pass Over to Player 2 to assign ships!\n",5);
+            enterToContinue(5);
+
 
             char gameGridPlayerTwo[GRID_SIZE][GRID_SIZE];
             displayEmptyGrid(gameGridPlayerTwo);
             assignShipPrompts(2, gameGridPlayerTwo);
+
+            typewrite("Random player selection ...", 15);
+            int firstPlayer = whoGoesFirst();
+            string playerPrompt = "Player " + to_string(firstPlayer) + " goes first!";
+            typewrite(playerPrompt, 10);
+
+            enterToContinue(10);
+
 
         } else {
             inputError = true;
