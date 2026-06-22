@@ -33,6 +33,7 @@ Features:
 * Basic player input
 * Minimal validation
 * No object-oriented programming
+* No vs computer option 
 
 Concepts practiced:
 
