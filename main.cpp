@@ -349,7 +349,7 @@ int main() {
                 if (allShipsSunk(reinterpret_cast<char(*)[GRID_SIZE]>(opponentGrid))) {
                     cout << "\n*** Player " << currentPlayer << " wins! All of Player "
                          << opponent << "'s ships have been sunk! ***\n";
-                    break;
+                    playerWon = true;
                 }
 
                 enterToContinue(10);
