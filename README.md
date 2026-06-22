@@ -105,6 +105,7 @@ Possible additions:
 * Random ship placement
 * Improved game rules
 * Score tracking
+* AI implmentation using skills learnt from AWS ai practioner certification. 
 
 Concepts introduced:
 
