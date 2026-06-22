@@ -271,9 +271,6 @@ bool fireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE], char trackingGrid[GRID_
     return isHit;
 }
 
-// -------------------------------------------------------
-// main() is excluded when building the test binary
-// -------------------------------------------------------
 #ifndef TESTING
 int main() {
     typewrite("Welcome to Battleships!\n", 20);
