@@ -385,6 +385,23 @@ int main() {
 
             enterToContinue(10);
 
+            char firstPlayerGrid[GRID_SIZE][GRID_SIZE];
+            cout << "Player " << firstPlayer << " - your tracking grid:\n";
+            displayGrid(firstPlayerGrid);
+
+            bool hit = false;
+
+
+            if (firstPlayer == 1) {
+                hit = fireAtGrid(gameGridPlayerTwo, firstPlayerGrid);
+            } else {
+                hit = fireAtGrid(gameGridPlayerOne, firstPlayerGrid);
+            }
+
+            cout << "\nYour updated tracking grid:\n";
+            displayGrid(firstPlayerGrid);
+
+
 
         } else {
             inputError = true;
