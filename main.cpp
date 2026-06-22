@@ -5,6 +5,8 @@
  * @version 1.0
  * @author Alex Samuel
  */
+#pgram once
+
 #include <iostream>
 #include <limits>
 #include <string>
