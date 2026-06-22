@@ -269,6 +269,71 @@ void enterToContinue(int delayMs) {
 }
 
 /**
+ * Fires at a coordinate on the opponent's grid.
+ * Marks the result on the attacking player's tracking grid.
+ * @param opponentGrid  the opponent's ship grid (to check for hits)
+ * @param trackingGrid  the current player's tracking grid (to record shots)
+ * @return true if the shot was a hit, false if a miss
+ */
+bool fireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE], char trackingGrid[GRID_SIZE][GRID_SIZE]) {
+    bool shotFired = false;
+    bool isHit = false;
+
+    while (!shotFired) {
+        cout << "Enter target coordinate (e.g. A5): ";
+        string input;
+        cin >> input;
+
+        if (!isValidCoordinate(input[0], input[1])) {
+            cout << "Invalid input, please enter a coordinate like A5\n";
+            continue;
+        }
+
+        char col = static_cast<char>(toupper(input[0]));
+        int row = -1;
+        bool parseSuccess = true;
+
+        try {
+            row = stoi(input.substr(1));
+        } catch (...) {
+            parseSuccess = false;
+            cout << "Invalid input, please enter a coordinate like A5\n";
+        }
+
+        if (!parseSuccess) continue;
+
+        if (!isValidCoordinate(col, row)) {
+            cout << "Invalid coordinate, column must be A-J and row must be 1-10\n";
+            continue;
+        }
+
+        int colIndex = col - 'A';
+        int rowIndex = row - 1;
+
+        // Check if this coordinate has already been fired at
+        if (trackingGrid[rowIndex][colIndex] == 'X' || trackingGrid[rowIndex][colIndex] == 'O') {
+            cout << "You have already fired at " << col << row << ", choose another coordinate\n";
+            continue;
+        }
+
+        // Check opponent's grid for a hit
+        if (opponentGrid[rowIndex][colIndex] != '~') {
+            cout << "HIT at " << col << row << "!\n";
+            trackingGrid[rowIndex][colIndex] = 'X';
+            opponentGrid[rowIndex][colIndex] = 'X'; // Mark hit on opponent's grid too
+            isHit = true;
+        } else {
+            cout << "MISS at " << col << row << ".\n";
+            trackingGrid[rowIndex][colIndex] = 'O';
+        }
+
+        shotFired = true;
+    }
+
+    return isHit;
+}
+
+/**
  * The main program which runs the battleship program.
  * Creates a list of user prompts.
  * Player selection is here.
