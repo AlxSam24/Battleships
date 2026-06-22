@@ -326,7 +326,8 @@ int main() {
             int currentPlayer = firstPlayer;
             bool playerWon = false;
 
-            while (true) {
+            while (!playerWon) {
+                playerWon = false;
                 int opponent = (currentPlayer == 1) ? 2 : 1;
                 char* opponentGrid   = (currentPlayer == 1)
                     ? &gameGridPlayerTwo[0][0] : &gameGridPlayerOne[0][0];
