@@ -324,6 +324,7 @@ int main() {
             initGrid(trackingGridTwo);
 
             int currentPlayer = firstPlayer;
+            bool playerWon = false;
 
             while (true) {
                 int opponent = (currentPlayer == 1) ? 2 : 1;
