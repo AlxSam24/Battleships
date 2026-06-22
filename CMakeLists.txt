@@ -6,7 +6,8 @@ set(CMAKE_CXX_STANDARD 20)
 # -------------------------------------------------------
 # Main game executable
 # -------------------------------------------------------
-add_executable(Battleships main.cpp)
+add_executable(Battleships main.cpp
+)
 
 # -------------------------------------------------------
 # Google Test (fetched automatically — no install needed)
@@ -22,9 +23,10 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(BattleshipsTests tests.cpp)
+add_executable(BattleshipsTests TestCases.cpp)
+target_compile_definitions(BattleshipsTests PRIVATE TESTING)
 target_link_libraries(BattleshipsTests PRIVATE GTest::gtest_main)
 
 include(GoogleTestHelpers OPTIONAL)
-include(GoogleTest OPTIONAL)
+include(GoogleTest)
 gtest_discover_tests(BattleshipsTests)
