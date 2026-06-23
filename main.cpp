@@ -209,9 +209,11 @@ void typewrite(const string& message, int delayMs = 30) {
 
 void enterToContinue(int delayMs) {
     typewrite("Press Enter to continue...", delayMs);
-    cin.clear();
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    cin.get();
+    if (cin.peek() == '\n') {
+        cin.get();  // consume just the newline already in the buffer
+    } else {
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');  // wait for user to press Enter
+    }
 }
 
 bool fireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE], char trackingGrid[GRID_SIZE][GRID_SIZE]) {
