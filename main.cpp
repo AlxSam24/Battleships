@@ -278,6 +278,13 @@ bool fireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE], char trackingGrid[GRID_
 
     return isHit;
 }
+bool playAgainFunc () {
+    typewrite("\nWould you like to play another game?\n", 5);
+    typewrite("1. Yes\n2. No\n", 5);
+    int again = 0;
+    cin >> again;
+    return (again == 1);
+}
 
 int main() {
     typewrite("Welcome to Battleships!\n", 20);
