@@ -17,9 +17,7 @@ using namespace std;
 constexpr int GRID_SIZE = 10;
 
 void clearScreen() {
-    // \033[2J clears the entire screen
-    // \033[1;1H moves the cursor to row 1, column 1
-    std::cout << "\033[2J\033[1;1H";
+    system("cls");
 }
 
 bool isValidRow(int row) {
@@ -286,6 +284,7 @@ int main() {
     typewrite("(Game created by Alex Samuel)\n", 20);
     typewrite("Press Enter to continue...", 10);
     cin.get();
+    clearScreen();
 
     bool playAgain = true;
 
@@ -324,16 +323,21 @@ int main() {
                 assignShipPrompts(1, gameGridPlayerOne);
                 typewrite("Pass Over to Player 2 to assign ships!\n", 5);
                 enterToContinue(5);
+                clearScreen();
 
                 char gameGridPlayerTwo[GRID_SIZE][GRID_SIZE];
                 initGrid(gameGridPlayerTwo);
                 assignShipPrompts(2, gameGridPlayerTwo);
+                typewrite("Pass the computer back to Player 1!\n", 5);
+                enterToContinue(5);
+                clearScreen();
 
                 typewrite("Random player selection ...", 15);
                 int firstPlayer = whoGoesFirst();
                 string playerPrompt = "Player " + to_string(firstPlayer) + " goes first!";
                 typewrite(playerPrompt, 10);
                 enterToContinue(10);
+                clearScreen();
 
                 char trackingGridOne[GRID_SIZE][GRID_SIZE];
                 char trackingGridTwo[GRID_SIZE][GRID_SIZE];
@@ -370,6 +374,7 @@ int main() {
 
                     if (!playerWon) {
                         enterToContinue(10);
+                        clearScreen();
                     }
                     currentPlayer = opponent;
                 }
