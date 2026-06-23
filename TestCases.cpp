@@ -333,3 +333,38 @@ TEST(WhoGoesFirst, AlwaysReturnsOneOrTwo) {
             << "whoGoesFirst() returned out-of-range value: " << result;
     }
 }
+// ============================================================
+// Win condition: loop terminates when all opponent ships sunk
+// ============================================================
+TEST(WinCondition, PlayerWonSetWhenAllShipsSunk) {
+    char opponentGrid[GRID_SIZE][GRID_SIZE];
+    makeGrid(opponentGrid);
+    placeShip(opponentGrid, 'A', 1, 2, true, 'D'); // place a destroyer
+
+    // Simulate firing at and hitting every ship cell
+    opponentGrid[0][0] = 'X';
+    opponentGrid[0][1] = 'X';
+
+    bool playerWon = false;
+    if (allShipsSunk(opponentGrid)) {
+        playerWon = true;
+    }
+
+    EXPECT_TRUE(playerWon);
+}
+
+TEST(WinCondition, PlayerWonNotSetWhileShipsRemain) {
+    char opponentGrid[GRID_SIZE][GRID_SIZE];
+    makeGrid(opponentGrid);
+    placeShip(opponentGrid, 'A', 1, 2, true, 'D');
+
+    // Only hit one of two cells
+    opponentGrid[0][0] = 'X';
+
+    bool playerWon = false;
+    if (allShipsSunk(opponentGrid)) {
+        playerWon = true;
+    }
+
+    EXPECT_FALSE(playerWon);
+}
