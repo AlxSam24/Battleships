@@ -307,7 +307,7 @@ int main() {
 
             } else if (choice == 1) {
                 inputError = false;
-                typewrite("\nComputer opponent not yet implemented!\n", 10);
+                typewrite("\nComputer opponent not yet implemented coming in version 2!\n", 10);
 
                 typewrite("\nWould you like to play another game?\n", 5);
                 typewrite("1. Yes\n2. No\n", 5);
