@@ -380,12 +380,7 @@ int main() {
                     }
                     currentPlayer = opponent;
                 }
-
-                typewrite("\nWould you like to play another game?\n", 5);
-                typewrite("1. Yes\n2. No\n", 5);
-                int again = 0;
-                cin >> again;
-                playAgain = (again == 1);
+                playAgain = playAgainFunc();
 
             } else {
                 inputError = true;
