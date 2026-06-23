@@ -16,6 +16,12 @@ using namespace std;
 
 constexpr int GRID_SIZE = 10;
 
+void clearScreen() {
+    // \033[2J clears the entire screen
+    // \033[1;1H moves the cursor to row 1, column 1
+    std::cout << "\033[2J\033[1;1H";
+}
+
 bool isValidRow(int row) {
     return row >= 1 && row <= GRID_SIZE;
 }
