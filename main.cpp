@@ -254,7 +254,8 @@ bool fireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE], char trackingGrid[GRID_
             continue;
         }
 
-        if (opponentGrid[rowIndex][colIndex] != '~' && opponentGrid[rowIndex][colIndex] != 'X') {
+        // Fresh shot — check the opponent's ORIGINAL grid
+        if (opponentGrid[rowIndex][colIndex] != '~') {   // anything not water = ship
             cout << "HIT at " << col << row << "!\n";
             trackingGrid[rowIndex][colIndex] = 'X';
             opponentGrid[rowIndex][colIndex] = 'X';
