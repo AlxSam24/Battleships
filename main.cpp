@@ -209,12 +209,8 @@ void typewrite(const string& message, int delayMs = 30) {
 
 void enterToContinue(int delayMs) {
     typewrite("Press Enter to continue...", delayMs);
-    if (cin.peek() == '\n') {
-        cin.get();  // consume just the newline already in the buffer
-    } else {
         cin.ignore(numeric_limits<streamsize>::max(), '\n');  // wait for user to press Enter
     }
-}
 
 bool fireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE], char trackingGrid[GRID_SIZE][GRID_SIZE]) {
     bool shotFired = false;
@@ -265,6 +261,7 @@ bool fireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE], char trackingGrid[GRID_
             cout << "HIT at " << col << row << "!\n";
             trackingGrid[rowIndex][colIndex] = 'X';
             opponentGrid[rowIndex][colIndex] = 'X';
+
             isHit = true;
         } else {
             cout << "MISS at " << col << row << ".\n";
@@ -278,7 +275,6 @@ bool fireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE], char trackingGrid[GRID_
     return isHit;
 }
 
-#ifndef TESTING
 int main() {
     typewrite("Welcome to Battleships!\n", 20);
     typewrite("(Game created by Alex Samuel)\n", 20);
@@ -317,8 +313,60 @@ int main() {
 
             } else if (choice == 2) {
                 inputError = false;
+                char gameGridPlayerOne[GRID_SIZE][GRID_SIZE];
+                initGrid(gameGridPlayerOne);
+                assignShipPrompts(1, gameGridPlayerOne);
+                typewrite("Pass Over to Player 2 to assign ships!\n", 5);
+                enterToContinue(5);
 
-                // ... all your game logic ...
+                char gameGridPlayerTwo[GRID_SIZE][GRID_SIZE];
+                initGrid(gameGridPlayerTwo);
+                assignShipPrompts(2, gameGridPlayerTwo);
+
+                typewrite("Random player selection ...", 15);
+                int firstPlayer = whoGoesFirst();
+                string playerPrompt = "Player " + to_string(firstPlayer) + " goes first!";
+                typewrite(playerPrompt, 10);
+                enterToContinue(10);
+
+                char trackingGridOne[GRID_SIZE][GRID_SIZE];
+                char trackingGridTwo[GRID_SIZE][GRID_SIZE];
+                initGrid(trackingGridOne);
+                initGrid(trackingGridTwo);
+
+                int currentPlayer = firstPlayer;
+                bool playerWon = false;
+
+                while (!playerWon) {
+                    int opponent = (currentPlayer == 1) ? 2 : 1;
+                    char* opponentGrid   = (currentPlayer == 1)
+                        ? &gameGridPlayerTwo[0][0] : &gameGridPlayerOne[0][0];
+                    char* myTrackingGrid = (currentPlayer == 1)
+                        ? &trackingGridOne[0][0]   : &trackingGridTwo[0][0];
+
+                    cout << "\n--- Player " << currentPlayer << "'s turn ---\n";
+                    cout << "Your tracking grid:\n";
+                    displayGrid(reinterpret_cast<char(*)[GRID_SIZE]>(myTrackingGrid));
+
+                    fireAtGrid(
+                        reinterpret_cast<char(*)[GRID_SIZE]>(opponentGrid),
+                        reinterpret_cast<char(*)[GRID_SIZE]>(myTrackingGrid)
+                    );
+
+                    cout << "\nYour updated tracking grid:\n";
+                    displayGrid(reinterpret_cast<char(*)[GRID_SIZE]>(myTrackingGrid));
+
+                    if (allShipsSunk(reinterpret_cast<char(*)[GRID_SIZE]>(opponentGrid))) {
+                        cout << "\n*** Player " << currentPlayer << " wins! All of Player "
+                             << opponent << "'s ships have been sunk! ***\n";
+                        playerWon = true;
+                    }
+
+                    if (!playerWon) {
+                        enterToContinue(10);
+                    }
+                    currentPlayer = opponent;
+                }
 
                 typewrite("\nWould you like to play another game?\n", 5);
                 typewrite("1. Yes\n2. No\n", 5);
@@ -339,4 +387,3 @@ int main() {
     typewrite("Thank you for playing Battleships!\n", 10);
     return 0;
 }
-#endif
