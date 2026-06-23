@@ -286,88 +286,105 @@ int main() {
     cin.get();
 
     bool inputError = false;
-    do {
-        typewrite("\nPlayer select required\n", 5);
-        typewrite("Would you like to play against the computer?\n", 5);
-        typewrite("1. Yes\n2. No\n", 5);
-        typewrite("Enter your choice: ", 5);
+    bool playAgain = true;
 
-        int choice;
-        cin >> choice;
+    while (playAgain) {
+        int choice = 0;
 
-        if (cin.fail()) {
-            inputError = true;
-            typewrite("Invalid input, please enter 1 (Yes) or 2 (No)\n", 10);
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        } else if (choice == 1) {
-            inputError = false;
-            // Computer opponent logic goes here
-        } else if (choice == 2) {
-            inputError = false;
+        do {
+            typewrite("\nPlayer select required\n", 5);
+            typewrite("Would you like to play against the computer?\n", 5);
+            typewrite("1. Yes\n2. No\n", 5);
+            typewrite("Enter your choice: ", 5);
 
-            char gameGridPlayerOne[GRID_SIZE][GRID_SIZE];
-            initGrid(gameGridPlayerOne);
-            assignShipPrompts(1, gameGridPlayerOne);
-            typewrite("Pass Over to Player 2 to assign ships!\n", 5);
-            enterToContinue(5);
+            cin >> choice;
 
-            char gameGridPlayerTwo[GRID_SIZE][GRID_SIZE];
-            initGrid(gameGridPlayerTwo);
-            assignShipPrompts(2, gameGridPlayerTwo);
+            if (cin.fail()) {
+                inputError = true;
+                typewrite("Invalid input, please enter 1 (Yes) or 2 (No)\n", 10);
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            } else if (choice == 1) {
+                inputError = false;
+                // Computer opponent logic goes here
+            } else if (choice == 2) {
+                inputError = false;
 
-            typewrite("Random player selection ...", 15);
-            int firstPlayer = whoGoesFirst();
-            string playerPrompt = "Player " + to_string(firstPlayer) + " goes first!";
-            typewrite(playerPrompt, 10);
-            enterToContinue(10);
+                char gameGridPlayerOne[GRID_SIZE][GRID_SIZE];
+                initGrid(gameGridPlayerOne);
+                assignShipPrompts(1, gameGridPlayerOne);
+                typewrite("Pass Over to Player 2 to assign ships!\n", 5);
+                enterToContinue(5);
 
-            char trackingGridOne[GRID_SIZE][GRID_SIZE];
-            char trackingGridTwo[GRID_SIZE][GRID_SIZE];
-            initGrid(trackingGridOne);
-            initGrid(trackingGridTwo);
+                char gameGridPlayerTwo[GRID_SIZE][GRID_SIZE];
+                initGrid(gameGridPlayerTwo);
+                assignShipPrompts(2, gameGridPlayerTwo);
 
-            int currentPlayer = firstPlayer;
-            bool playerWon = false;
+                typewrite("Random player selection ...", 15);
+                int firstPlayer = whoGoesFirst();
+                string playerPrompt = "Player " + to_string(firstPlayer) + " goes first!";
+                typewrite(playerPrompt, 10);
+                enterToContinue(10);
 
-            while (!playerWon) {
-                playerWon = false;
-                int opponent = (currentPlayer == 1) ? 2 : 1;
-                char* opponentGrid   = (currentPlayer == 1)
-                    ? &gameGridPlayerTwo[0][0] : &gameGridPlayerOne[0][0];
-                char* myTrackingGrid = (currentPlayer == 1)
-                    ? &trackingGridOne[0][0]   : &trackingGridTwo[0][0];
+                char trackingGridOne[GRID_SIZE][GRID_SIZE];
+                char trackingGridTwo[GRID_SIZE][GRID_SIZE];
+                initGrid(trackingGridOne);
+                initGrid(trackingGridTwo);
 
-                cout << "\n--- Player " << currentPlayer << "'s turn ---\n";
-                cout << "Your tracking grid:\n";
-                displayGrid(reinterpret_cast<char(*)[GRID_SIZE]>(myTrackingGrid));
+                int currentPlayer = firstPlayer;
+                bool playerWon = false;
 
-                fireAtGrid(
-                    reinterpret_cast<char(*)[GRID_SIZE]>(opponentGrid),
-                    reinterpret_cast<char(*)[GRID_SIZE]>(myTrackingGrid)
-                );
+                while (!playerWon) {
+                    int opponent = (currentPlayer == 1) ? 2 : 1;
+                    char* opponentGrid   = (currentPlayer == 1)
+                        ? &gameGridPlayerTwo[0][0] : &gameGridPlayerOne[0][0];
+                    char* myTrackingGrid = (currentPlayer == 1)
+                        ? &trackingGridOne[0][0]   : &trackingGridTwo[0][0];
 
-                cout << "\nYour updated tracking grid:\n";
-                displayGrid(reinterpret_cast<char(*)[GRID_SIZE]>(myTrackingGrid));
+                    cout << "\n--- Player " << currentPlayer << "'s turn ---\n";
+                    cout << "Your tracking grid:\n";
+                    displayGrid(reinterpret_cast<char(*)[GRID_SIZE]>(myTrackingGrid));
 
-                if (allShipsSunk(reinterpret_cast<char(*)[GRID_SIZE]>(opponentGrid))) {
-                    cout << "\n*** Player " << currentPlayer << " wins! All of Player "
-                         << opponent << "'s ships have been sunk! ***\n";
-                    playerWon = true;
+                    fireAtGrid(
+                        reinterpret_cast<char(*)[GRID_SIZE]>(opponentGrid),
+                        reinterpret_cast<char(*)[GRID_SIZE]>(myTrackingGrid)
+                    );
+
+                    cout << "\nYour updated tracking grid:\n";
+                    displayGrid(reinterpret_cast<char(*)[GRID_SIZE]>(myTrackingGrid));
+
+                    if (allShipsSunk(reinterpret_cast<char(*)[GRID_SIZE]>(opponentGrid))) {
+                        cout << "\n*** Player " << currentPlayer << " wins! All of Player "
+                             << opponent << "'s ships have been sunk! ***\n";
+                        playerWon = true;
+                    }
+
+                    if (!playerWon) {
+                        enterToContinue(10);
+                    }
+                    currentPlayer = opponent;
                 }
 
-                enterToContinue(10);
-                currentPlayer = opponent;
-            }
-        } else {
-            inputError = true;
-            cout << "Invalid input, please enter 1 (Yes) or 2 (No)\n";
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cin.get();
-        }
-    } while (inputError);
+                // --- Play again prompt ---
+                typewrite("\nWould you like to play another game?\n", 5);
+                typewrite("1. Yes\n2. No\n", 5);
 
+                int again = 0;
+                cin >> again;
+                if (again == 2) {
+                    playAgain = false;
+                }
+
+            } else {
+                inputError = true;
+                cout << "Invalid input, please enter 1 (Yes) or 2 (No)\n";
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            }
+        } while (inputError);
+    }
+
+    typewrite("Thank you for playing Battleships!\n", 10);
     return 0;
 }
 #endif
