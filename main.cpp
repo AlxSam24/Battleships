@@ -337,8 +337,6 @@ int main() {
     }
 
     typewrite("Thank you for playing Battleships!\n", 10);
-
-    typewrite("Thank you for playing Battleships!\n", 10);
     return 0;
 }
 #endif
