@@ -70,7 +70,7 @@ void placeShip(char gameGrid[GRID_SIZE][GRID_SIZE], char col, int row, int size,
 }
 
 void displayGrid(char gameGrid[GRID_SIZE][GRID_SIZE]) {
-    cout << "  A B C D E F G H I J\n";
+    cout << "   A B C D E F G H I J\n";
     for (int r = 0; r < GRID_SIZE; r++) {
         cout << (r + 1);
         if (r + 1 < 10) cout << " ";
