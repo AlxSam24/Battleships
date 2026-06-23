@@ -219,6 +219,10 @@ bool fireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE], char trackingGrid[GRID_
     bool isHit = false;
 
     while (!shotFired) {
+        if (cin.fail() || cin.eof()) {
+            cerr << "\nError: ran out of input\n";
+            exit(1);
+        }
         cout << "Enter target coordinate (e.g. A5): ";
         string input;
         cin >> input;
