@@ -25,6 +25,11 @@ enum CellState {
     SUNK,
 };
 
+struct Ship {
+    int length;
+    bool isSunk;
+};
+
 void clearScreen() {
     system("cls");
 }
