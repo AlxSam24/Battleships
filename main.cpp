@@ -11,7 +11,9 @@
 #include <random>
 #include <chrono>
 #include <thread>
-
+#include <vector>
+#include <algorithm>
+#include <iomanip>
 using namespace std;
 
 constexpr int GRID_SIZE = 10;
