@@ -18,6 +18,13 @@ using namespace std;
 
 constexpr int GRID_SIZE = 10;
 
+enum CellState {
+    UNKNOWN,
+    HIT,
+    MISS,
+    SUNK,
+};
+
 void clearScreen() {
     system("cls");
 }
