@@ -30,23 +30,50 @@ struct Ship {
     bool isSunk;
 };
 
+/**
+ * Clears the terminal screen.
+ */
 void clearScreen() {
     system("cls");
 }
 
+/**
+ * Checks whether a given row number is within the valid grid range (1–10).
+ * @param row the row number to validate
+ * @return true if the row is between 1 and GRID_SIZE inclusive
+ */
 bool isValidRow(int row) {
     return row >= 1 && row <= GRID_SIZE;
 }
 
+/**
+ * Checks whether a given column character is within the valid grid range (A–J).
+ * @param col the column character to validate (case-insensitive)
+ * @return true if the column is between 'A' and 'J' inclusive
+ */
 bool isValidCol(char col) {
     col = static_cast<char>(toupper(col));
     return col >= 'A' && col <= 'J';
 }
 
+/**
+ * Checks whether a given column and row combination forms a valid grid coordinate.
+ * @param col the column character (case-insensitive)
+ * @param row the row number
+ * @return true if both the column and row are within valid grid bounds
+ */
 bool isValidCoordinate(char col, int row) {
     return isValidRow(row) && isValidCol(col);
 }
 
+/**
+ * Checks whether a ship of a given size fits on the grid from a starting position.
+ * @param col the starting column character (case-insensitive)
+ * @param row the starting row number
+ * @param size the length of the ship
+ * @param horizontal true if the ship is placed horizontally, false if vertically
+ * @return true if the ship fits entirely within the grid boundaries
+ */
 bool shipFits(char col, int row, int size, bool horizontal) {
     col = static_cast<char>(toupper(col));
     if (horizontal) {
@@ -57,6 +84,15 @@ bool shipFits(char col, int row, int size, bool horizontal) {
     return endRow <= GRID_SIZE;
 }
 
+/**
+ * Checks whether a ship placement would overlap any existing ships on the grid.
+ * @param gameGrid the grid to check for existing ship placements
+ * @param col the starting column character (case-insensitive)
+ * @param row the starting row number
+ * @param size the length of the ship
+ * @param horizontal true if the ship is placed horizontally, false if vertically
+ * @return true if there is no overlap with existing ships
+ */
 bool noOverlap(char gameGrid[GRID_SIZE][GRID_SIZE], char col, int row, int size, bool horizontal) {
     col = static_cast<char>(toupper(col));
     int colIndex = col - 'A';
@@ -72,6 +108,15 @@ bool noOverlap(char gameGrid[GRID_SIZE][GRID_SIZE], char col, int row, int size,
     return true;
 }
 
+/**
+ * Places a ship on the grid by marking each occupied cell with the given symbol.
+ * @param gameGrid the grid on which to place the ship
+ * @param col the starting column character (case-insensitive)
+ * @param row the starting row number
+ * @param size the length of the ship
+ * @param horizontal true if the ship is placed horizontally, false if vertically
+ * @param symbol the character used to represent this ship on the grid
+ */
 void placeShip(char gameGrid[GRID_SIZE][GRID_SIZE], char col, int row, int size, bool horizontal, char symbol) {
     col = static_cast<char>(toupper(col));
     int colIndex = col - 'A';
@@ -86,6 +131,11 @@ void placeShip(char gameGrid[GRID_SIZE][GRID_SIZE], char col, int row, int size,
     }
 }
 
+/**
+ * Displays the current state of a grid to standard output.
+ * Column headers are printed as letters (A–J) and row numbers as integers (1–10).
+ * @param gameGrid the grid to display
+ */
 void displayGrid(char gameGrid[GRID_SIZE][GRID_SIZE]) {
     cout << "   A B C D E F G H I J\n";
     for (int r = 0; r < GRID_SIZE; r++) {
@@ -129,6 +179,14 @@ bool allShipsSunk(char grid[GRID_SIZE][GRID_SIZE]) {
     return true;
 }
 
+/**
+ * Prompts the current player to place a single named ship on their grid.
+ * Validates the coordinate, orientation, fit, and overlap before placing.
+ * @param gameGrid the player's grid on which to place the ship
+ * @param shipName the display name of the ship (e.g. "Carrier")
+ * @param size the length of the ship in cells
+ * @param symbol the character used to represent the ship on the grid
+ */
 void assignShip(char gameGrid[GRID_SIZE][GRID_SIZE], const string& shipName, int size, char symbol) {
     cout << "\nAssign your " << shipName << " (size " << size << ")\n";
 
@@ -197,6 +255,12 @@ void assignShip(char gameGrid[GRID_SIZE][GRID_SIZE], const string& shipName, int
     }
 }
 
+/**
+ * Guides a player through placing all five ships on their grid.
+ * Ships placed are: Carrier (5), Battleship (4), Cruiser (3), Submarine (3), Destroyer (2).
+ * @param playerNum the player number (1 or 2), used for display purposes
+ * @param gameGrid the player's grid on which all ships will be placed
+ */
 void assignShipPrompts(const int playerNum, char gameGrid[GRID_SIZE][GRID_SIZE]) {
     cout << "Player " << playerNum << " - assign your ships\n";
     displayGrid(gameGrid);
@@ -209,6 +273,11 @@ void assignShipPrompts(const int playerNum, char gameGrid[GRID_SIZE][GRID_SIZE])
     displayGrid(gameGrid);
 }
 
+/**
+ * Randomly selects which player (1 or 2) takes the first turn.
+ * Uses a non-deterministic random device as the seed.
+ * @return 1 or 2, chosen at random
+ */
 int whoGoesFirst() {
     random_device rd;
     mt19937 gen(rd());
@@ -216,6 +285,12 @@ int whoGoesFirst() {
     return dist(gen);
 }
 
+/**
+ * Prints a message to standard output one character at a time with a configurable delay,
+ * creating a typewriter effect.
+ * @param message the string to print character by character
+ * @param delayMs the delay in milliseconds between each character (default: 30)
+ */
 void typewrite(const string& message, int delayMs = 30) {
     for (char c : message) {
         cout << c << flush;
@@ -224,11 +299,24 @@ void typewrite(const string& message, int delayMs = 30) {
     cout << "\n";
 }
 
+/**
+ * Prompts the user to press Enter and then waits for them to do so.
+ * @param delayMs the delay in milliseconds used for the typewrite prompt
+ */
 void enterToContinue(int delayMs) {
     typewrite("Press Enter to continue...", delayMs);
         cin.ignore(numeric_limits<streamsize>::max(), '\n');  // wait for user to press Enter
     }
 
+/**
+ * Handles a single firing action for the current player.
+ * Prompts for a target coordinate, validates it, checks it has not already been fired at,
+ * then marks the result as a hit ('X') or miss ('O') on both the opponent's grid
+ * and the current player's tracking grid.
+ * @param opponentGrid the opponent's game grid, updated in place on a hit or miss
+ * @param trackingGrid the current player's tracking grid, updated in place with 'X' or 'O'
+ * @return true if the shot was a hit, false if it was a miss
+ */
 bool fireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE], char trackingGrid[GRID_SIZE][GRID_SIZE]) {
     bool shotFired = false;
     bool isHit = false;
@@ -291,6 +379,12 @@ bool fireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE], char trackingGrid[GRID_
 
     return isHit;
 }
+
+/**
+ * Asks the players whether they would like to start a new game.
+ * Displays a prompt with options 1 (Yes) and 2 (No).
+ * @return true if the players choose to play again, false otherwise
+ */
 bool playAgainFunc () {
     typewrite("\nWould you like to play another game?\n", 5);
     typewrite("1. Yes\n2. No\n", 5);
@@ -299,6 +393,12 @@ bool playAgainFunc () {
     return (again == 1);
 }
 
+/**
+ * Entry point for the Battleships game.
+ * Manages the outer play-again loop, player-select menu, ship placement,
+ * turn-based firing, and win detection for a two-player local game.
+ * @return 0 on normal exit
+ */
 int main() {
     typewrite("Welcome to Battleships!\n", 20);
     typewrite("(Game created by Alex Samuel)\n", 20);
