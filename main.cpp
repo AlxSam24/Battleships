@@ -38,10 +38,9 @@ bool shipFits(char col, int row, int size, bool horizontal) {
     if (horizontal) {
         int endCol = (col - 'A') + size - 1;
         return endCol < GRID_SIZE;
-    } else {
-        int endRow = row + size - 1;
-        return endRow <= GRID_SIZE;
     }
+    int endRow = row + size - 1;
+    return endRow <= GRID_SIZE;
 }
 
 bool noOverlap(char gameGrid[GRID_SIZE][GRID_SIZE], char col, int row, int size, bool horizontal) {
