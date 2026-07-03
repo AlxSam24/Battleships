@@ -379,6 +379,29 @@ bool fireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE], char trackingGrid[GRID_
 
     return isHit;
 }
+char randomComputerShipXCoordinate() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distribution(0, 25);
+    char random_coordinate = 'a' + distribution(gen);
+    return random_coordinate;
+}
+int randomComputerShipYCoordinate() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distribution(0, 10);
+    int random_coordinate = distribution(gen);
+    return random_coordinate;
+}
+
+void assignComputerShips (char gameGrid [GRID_SIZE][GRID_SIZE], int delayMS) {
+    typewrite("Computer Assigning Ships ...", delayMS);
+    assignShip(gameGrid, "Carrier",     randomComputerShipYCoordinate(), randomComputerShipXCoordinate());
+    assignShip(gameGrid, "Battleship", randomComputerShipYCoordinate(), randomComputerShipXCoordinate());
+    assignShip(gameGrid, "Cruiser",    randomComputerShipYCoordinate(), randomComputerShipXCoordinate());
+    assignShip(gameGrid, "Submarine",  randomComputerShipYCoordinate(), randomComputerShipXCoordinate());
+    assignShip(gameGrid, "Destroyer",  randomComputerShipYCoordinate(), randomComputerShipXCoordinate());
+}
 
 /**
  * Asks the players whether they would like to start a new game.
