@@ -430,6 +430,71 @@ bool playAgainFunc () {
     cin >> again;
     return (again == 1);
 }
+struct ComputerAI {
+    vector<pair<int,int>> candidateQueue; // cells queued up to try next in target mode
+};
+
+bool inBounds(int row, int column) {
+    return row >= 0 && row < GRID_SIZE && column >= 0 && column < GRID_SIZE;
+}
+
+bool alreadyTried(char trackingGrid[GRID_SIZE][GRID_SIZE], int row, int column) {
+    return trackingGrid[row][column] == 'X' || trackingGrid[row][column] == 'O';
+}
+
+// Queue up the four orthogonal neighbours of a fresh hit
+void queueNeighbours(ComputerAI& ai, char trackingGrid[GRID_SIZE][GRID_SIZE], const int row, const int column) {
+    for (int i = 0; i < 4; i++) {
+        constexpr int deltaColumn[] = {0, 0, -1, 1};
+        constexpr int deltaRow[] = {-1, 1, 0, 0};
+        int neighbourRow = row + deltaRow[i];
+        if (int neighbourColumn = column + deltaColumn[i]; inBounds(neighbourRow, neighbourColumn)
+            && !alreadyTried(trackingGrid, neighbourRow, neighbourColumn)) {
+            ai.candidateQueue.emplace_back(neighbourRow, neighbourColumn);
+        }
+    }
+}
+
+bool computerFireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE],
+                         char trackingGrid[GRID_SIZE][GRID_SIZE],
+                         ComputerAI& ai) {
+    int rowIndex = -1, colIndex = -1;
+
+    if (!ai.candidateQueue.empty()) {
+        // TARGET MODE: work through queued cells near a known hit
+        while (!ai.candidateQueue.empty()) {
+            auto [r, c] = ai.candidateQueue.back();
+            ai.candidateQueue.pop_back();
+            if (!alreadyTried(trackingGrid, r, c)) {
+                rowIndex = r; colIndex = c;
+                break;
+            }
+        }
+    }
+
+    if (rowIndex == -1) {
+        // HUNT MODE: random cell on checkerboard parity, not already tried
+        do {
+            rowIndex = randomComputerShipRow() - 1;
+            colIndex = randomComputerShipColumn() - 'a';
+        } while (alreadyTried(trackingGrid, rowIndex, colIndex)
+                 || (rowIndex + colIndex) % 2 != 0);
+    }
+
+    bool isHit = (opponentGrid[rowIndex][colIndex] != '~');
+    char mark = isHit ? 'X' : 'O';
+    trackingGrid[rowIndex][colIndex] = mark;
+    opponentGrid[rowIndex][colIndex] = mark;
+
+    cout << "Computer fires at " << static_cast<char>('A' + colIndex)
+         << (rowIndex + 1) << " — " << (isHit ? "HIT!" : "MISS.") << "\n";
+
+    if (isHit) {
+        queueNeighbours(ai, trackingGrid, rowIndex, colIndex);
+    }
+
+    return isHit;
+}
 
 /**
  * Entry point for the Battleships game.
