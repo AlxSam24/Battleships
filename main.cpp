@@ -389,7 +389,7 @@ char randomComputerShipColumn() {
 int randomComputerShipRow() {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distribution(0, 10);
+    std::uniform_int_distribution<> distribution(1, 10);
     int random_coordinate = distribution(gen);
     return random_coordinate;
 }
