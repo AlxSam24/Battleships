@@ -467,8 +467,9 @@ int main() {
 
             } else if (choice == 1) {
                 inputError = false;
-                typewrite("\nComputer opponent not yet implemented coming in version 2!\n", 10);
-                playAgain = playAgainFunc();
+                char gameGridComputer[GRID_SIZE][GRID_SIZE];
+                initGrid(gameGridComputer);
+
 
             } else if (choice == 2) {
                 inputError = false;
