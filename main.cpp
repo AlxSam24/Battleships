@@ -469,6 +469,13 @@ int main() {
                 inputError = false;
                 char gameGridComputer[GRID_SIZE][GRID_SIZE];
                 initGrid(gameGridComputer);
+                displayGrid(gameGridComputer);
+                assignComputerShips(gameGridComputer, 5);
+                typewrite("Computer is ready!\n", 5);
+                displayGrid(gameGridComputer);
+                enterToContinue(5);
+                clearScreen();
+
 
 
             } else if (choice == 2) {
