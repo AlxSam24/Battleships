@@ -401,7 +401,7 @@ bool randomComputerShipOrientation() {
     return random_orientation;
 }
 void validateComputerShipAssignment(char gameGrid[GRID_SIZE][GRID_SIZE], char col, int row, int size, bool horizontal, char symbol) {
-    while (!shipFits(col, row, size, horizontal) && !noOverlap(gameGrid, col, row, size, horizontal)) {
+    while (!shipFits(col, row, size, horizontal) || !noOverlap(gameGrid, col, row, size, horizontal)) {
             placeShip(gameGrid, col, row, size, horizontal, symbol);
             displayGrid(gameGrid);
         }
