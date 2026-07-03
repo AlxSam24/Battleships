@@ -401,6 +401,7 @@ void assignComputerShips (char gameGrid [GRID_SIZE][GRID_SIZE], int delayMS) {
     assignShip(gameGrid, "Cruiser",    randomComputerShipYCoordinate(), randomComputerShipXCoordinate());
     assignShip(gameGrid, "Submarine",  randomComputerShipYCoordinate(), randomComputerShipXCoordinate());
     assignShip(gameGrid, "Destroyer",  randomComputerShipYCoordinate(), randomComputerShipXCoordinate());
+    displayGrid(gameGrid);
 }
 
 /**
