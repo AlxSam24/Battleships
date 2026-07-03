@@ -415,7 +415,6 @@ void assignComputerShips (char gameGrid [GRID_SIZE][GRID_SIZE], int delayMS) {
     validateComputerShipAssignment(gameGrid, randomComputerShipColumn(), randomComputerShipRow(), 4, randomComputerShipOrientation(), 'B');
     validateComputerShipAssignment(gameGrid, randomComputerShipColumn(), randomComputerShipRow(), 3, randomComputerShipOrientation(), 'R');
     validateComputerShipAssignment(gameGrid, randomComputerShipColumn(), randomComputerShipRow(), 2, randomComputerShipOrientation(), 'D');
-    displayGrid(gameGrid);
     typewrite("Computer Ships Assigned ...", delayMS);
     enterToContinue(delayMS);
     clearScreen();
