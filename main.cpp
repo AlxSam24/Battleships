@@ -386,7 +386,7 @@ char randomComputerShipColumn() {
     char random_coordinate = 'a' + distribution(gen);
     return random_coordinate;
 }
-int randomComputerShipYCoordinate() {
+int randomComputerShipRow() {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> distribution(0, 10);
