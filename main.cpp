@@ -406,6 +406,8 @@ void validateComputerShipAssignment(char gameGrid[GRID_SIZE][GRID_SIZE], char co
             row = randomComputerShipRow();
             horizontal = randomComputerShipOrientation();
         }
+        placeShip(gameGrid, col, row, size, horizontal, symbol);
+        displayGrid(gameGrid);
     }
 
 void assignComputerShips (char gameGrid [GRID_SIZE][GRID_SIZE], int delayMS) {
