@@ -382,7 +382,7 @@ bool fireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE], char trackingGrid[GRID_
 char randomComputerShipColumn() {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distribution(0, 25);
+    std::uniform_int_distribution<> distribution(0, 9);
     char random_coordinate = 'a' + distribution(gen);
     return random_coordinate;
 }
