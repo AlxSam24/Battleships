@@ -305,8 +305,8 @@ void typewrite(const string& message, int delayMs = 30) {
  */
 void enterToContinue(int delayMs) {
     typewrite("Press Enter to continue...", delayMs);
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');  // wait for user to press Enter
-    }
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');  // wait for user to press Enter
+}
 
 /**
  * Handles a single firing action for the current player.
@@ -379,6 +379,7 @@ bool fireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE], char trackingGrid[GRID_
 
     return isHit;
 }
+
 char randomComputerShipColumn() {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -386,6 +387,7 @@ char randomComputerShipColumn() {
     char random_coordinate = 'a' + distribution(gen);
     return random_coordinate;
 }
+
 int randomComputerShipRow() {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -393,6 +395,7 @@ int randomComputerShipRow() {
     int random_coordinate = distribution(gen);
     return random_coordinate;
 }
+
 bool randomComputerShipOrientation() {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -400,49 +403,80 @@ bool randomComputerShipOrientation() {
     bool random_orientation = distribution(gen);
     return random_orientation;
 }
+
 void validateComputerShipAssignment(char gameGrid[GRID_SIZE][GRID_SIZE], char col, int row, int size, bool horizontal, char symbol) {
     while (!shipFits(col, row, size, horizontal) || !noOverlap(gameGrid, col, row, size, horizontal)) {
-            col = randomComputerShipColumn();
-            row = randomComputerShipRow();
-            horizontal = randomComputerShipOrientation();
-        }
-        placeShip(gameGrid, col, row, size, horizontal, symbol);
+        col = randomComputerShipColumn();
+        row = randomComputerShipRow();
+        horizontal = randomComputerShipOrientation();
     }
+    placeShip(gameGrid, col, row, size, horizontal, symbol);
+}
 
-void assignComputerShips (char gameGrid [GRID_SIZE][GRID_SIZE], int delayMS) {
+void assignComputerShips(char gameGrid[GRID_SIZE][GRID_SIZE], int delayMS) {
     typewrite("Computer Assigning Ships ...", delayMS);
     validateComputerShipAssignment(gameGrid, randomComputerShipColumn(), randomComputerShipRow(), 5, randomComputerShipOrientation(), 'C');
     validateComputerShipAssignment(gameGrid, randomComputerShipColumn(), randomComputerShipRow(), 4, randomComputerShipOrientation(), 'B');
     validateComputerShipAssignment(gameGrid, randomComputerShipColumn(), randomComputerShipRow(), 3, randomComputerShipOrientation(), 'R');
-    validateComputerShipAssignment(gameGrid, randomComputerShipColumn(), randomComputerShipRow(), 2,
-                                   randomComputerShipOrientation(), 'D');
+    validateComputerShipAssignment(gameGrid, randomComputerShipColumn(), randomComputerShipRow(), 3, randomComputerShipOrientation(), 'S');
+    validateComputerShipAssignment(gameGrid, randomComputerShipColumn(), randomComputerShipRow(), 2, randomComputerShipOrientation(), 'D');
 }
 
 /**
- * Asks the players whether they would like to start a new game.
- * Displays a prompt with options 1 (Yes) and 2 (No).
- * @return true if the players choose to play again, false otherwise
+ * Tracks everything the computer AI knows about one specific opponent ship:
+ * its symbol/length (so we know how many hits sink it), how many hits it has
+ * taken so far, whether it has been confirmed sunk, and which cells were hit.
  */
-bool playAgainFunc () {
-    typewrite("\nWould you like to play another game?\n", 5);
-    typewrite("1. Yes\n2. No\n", 5);
-    int again = 0;
-    cin >> again;
-    return (again == 1);
-}
-struct ComputerAI {
-    vector<pair<int,int>> candidateQueue; // cells queued up to try next in target mode
+struct ShipTarget {
+    char symbol;
+    int length;
+    int hitsTaken = 0;
+    bool sunk = false;
+    vector<pair<int, int>> hitCells;
 };
 
-bool inBounds(int row, int column) {
-    return row >= 0 && row < GRID_SIZE && column >= 0 && column < GRID_SIZE;
+/**
+ * Persistent state for the computer's targeting AI across an entire game.
+ * candidateQueue holds cells queued up to try next because they are adjacent
+ * to a known, not-yet-sunk hit ("Target mode"). ships tracks sink progress
+ * for each of the five opponent ships by their placement symbol.
+ */
+struct ComputerAI {
+    vector<pair<int, int>> candidateQueue;
+    vector<ShipTarget> ships = {
+        {'C', 5}, {'B', 4}, {'R', 3}, {'S', 3}, {'D', 2}
+    };
+};
+
+/**
+ * Checks whether a 0-indexed row/column pair lies within the grid bounds.
+ * @param r the row index (0-based)
+ * @param c the column index (0-based)
+ * @return true if both indices are within [0, GRID_SIZE)
+ */
+bool inBounds(int r, int c) {
+    return r >= 0 && r < GRID_SIZE && c >= 0 && c < GRID_SIZE;
 }
 
-bool alreadyTried(char trackingGrid[GRID_SIZE][GRID_SIZE], int row, int column) {
-    return trackingGrid[row][column] == 'X' || trackingGrid[row][column] == 'O';
+/**
+ * Checks whether a cell on a tracking grid has already been fired at.
+ * @param trackingGrid the tracking grid to check
+ * @param r the row index (0-based)
+ * @param c the column index (0-based)
+ * @return true if the cell is marked 'X' (hit) or 'O' (miss)
+ */
+bool alreadyTried(char trackingGrid[GRID_SIZE][GRID_SIZE], int r, int c) {
+    return trackingGrid[r][c] == 'X' || trackingGrid[r][c] == 'O';
 }
 
-// Queue up the four orthogonal neighbours of a fresh hit
+/**
+ * Queues the (up to four) orthogonal neighbours of a given cell as candidates
+ * for the computer's next shots, skipping any that are off-grid or already fired at.
+ * @param ai the computer AI state whose candidateQueue will be appended to
+ * @param trackingGrid the computer's tracking grid, used to skip already-tried cells
+ * @param row the row index (0-based) of the cell whose neighbours to queue
+ * @param column the column index (0-based) of the cell whose neighbours to queue
+ */
 void queueNeighbours(ComputerAI& ai, char trackingGrid[GRID_SIZE][GRID_SIZE], const int row, const int column) {
     for (int i = 0; i < 4; i++) {
         constexpr int deltaColumn[] = {0, 0, -1, 1};
@@ -455,18 +489,70 @@ void queueNeighbours(ComputerAI& ai, char trackingGrid[GRID_SIZE][GRID_SIZE], co
     }
 }
 
+/**
+ * Looks up a ship target record by its grid placement symbol.
+ * @param ai the computer AI state to search
+ * @param symbol the ship's placement symbol (e.g. 'C', 'B', 'R', 'S', 'D')
+ * @return a pointer to the matching ShipTarget, or nullptr if not found
+ */
+ShipTarget* findShipBySymbol(ComputerAI& ai, char symbol) {
+    for (auto& ship : ai.ships) {
+        if (ship.symbol == symbol) return &ship;
+    }
+    return nullptr;
+}
+
+/**
+ * Rebuilds the candidate queue from scratch using only the hit cells of ships
+ * that are still afloat, discarding any stale leads left over from a ship
+ * that has since been confirmed sunk.
+ * @param ai the computer AI state whose candidateQueue will be rebuilt
+ * @param trackingGrid the computer's tracking grid, used to skip already-tried cells
+ */
+void rebuildCandidateQueue(ComputerAI& ai, char trackingGrid[GRID_SIZE][GRID_SIZE]) {
+    ai.candidateQueue.clear();
+    for (const auto& ship : ai.ships) {
+        if (ship.sunk) continue;
+        for (const auto& [r, c] : ship.hitCells) {
+            queueNeighbours(ai, trackingGrid, r, c);
+        }
+    }
+}
+
+/**
+ * Counts how many of the computer's tracked target ships have been sunk so far.
+ * @param ai the computer AI state to inspect
+ * @return the number of ships marked sunk
+ */
+int shipsSunkCount(const ComputerAI& ai) {
+    return static_cast<int>(count_if(ai.ships.begin(), ai.ships.end(),
+        [](const ShipTarget& s) { return s.sunk; }));
+}
+
+/**
+ * Performs one computer-controlled firing action against the human player's grid.
+ * Uses a Hunt/Target state machine: if there are queued candidate cells near a
+ * known, unsunk hit ("Target mode"), it fires at one of those; otherwise it
+ * fires at a random untried cell restricted to checkerboard parity ("Hunt mode").
+ * Tracks which specific ship was hit (by its placement symbol) so it can detect
+ * when that ship has been fully sunk and purge stale queued leads accordingly.
+ * @param opponentGrid the human player's game grid, updated in place on a hit or miss
+ * @param trackingGrid the computer's tracking grid, updated in place with 'X' or 'O'
+ * @param ai the computer's persistent targeting AI state
+ * @return true if the shot was a hit, false if it was a miss
+ */
 bool computerFireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE],
                          char trackingGrid[GRID_SIZE][GRID_SIZE],
                          ComputerAI& ai) {
     int rowIndex = -1, colIndex = -1;
 
     if (!ai.candidateQueue.empty()) {
-        // TARGET MODE: work through queued cells near a known hit
+        // TARGET MODE: work through queued cells near a known, unsunk hit
         while (!ai.candidateQueue.empty()) {
-            auto [r, c] = ai.candidateQueue.back();
+            auto [row, column] = ai.candidateQueue.back();
             ai.candidateQueue.pop_back();
-            if (!alreadyTried(trackingGrid, r, c)) {
-                rowIndex = r; colIndex = c;
+            if (!alreadyTried(trackingGrid, row, column)) {
+                rowIndex = row; colIndex = column;
                 break;
             }
         }
@@ -481,25 +567,52 @@ bool computerFireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE],
                  || (rowIndex + colIndex) % 2 != 0);
     }
 
-    bool isHit = (opponentGrid[rowIndex][colIndex] != '~');
+    char hitSymbol = opponentGrid[rowIndex][colIndex];   // capture BEFORE it gets overwritten
+    bool isHit = (hitSymbol != '~');
     char mark = isHit ? 'X' : 'O';
     trackingGrid[rowIndex][colIndex] = mark;
     opponentGrid[rowIndex][colIndex] = mark;
 
     cout << "Computer fires at " << static_cast<char>('A' + colIndex)
-         << (rowIndex + 1) << " — " << (isHit ? "HIT!" : "MISS.") << "\n";
+         << (rowIndex + 1) << " - " << (isHit ? "HIT!" : "MISS.") << "\n";
 
     if (isHit) {
-        queueNeighbours(ai, trackingGrid, rowIndex, colIndex);
+        ShipTarget* ship = findShipBySymbol(ai, hitSymbol);
+        if (ship != nullptr) {
+            ship->hitsTaken++;
+            ship->hitCells.emplace_back(rowIndex, colIndex);
+
+            if (ship->hitsTaken >= ship->length) {
+                ship->sunk = true;
+                cout << "Computer sank your ship (length " << ship->length << ")!\n";
+                rebuildCandidateQueue(ai, trackingGrid);
+            } else {
+                queueNeighbours(ai, trackingGrid, rowIndex, colIndex);
+            }
+        }
     }
 
     return isHit;
 }
 
 /**
+ * Asks the players whether they would like to start a new game.
+ * Displays a prompt with options 1 (Yes) and 2 (No).
+ * @return true if the players choose to play again, false otherwise
+ */
+bool playAgainFunc() {
+    typewrite("\nWould you like to play another game?\n", 5);
+    typewrite("1. Yes\n2. No\n", 5);
+    int again = 0;
+    cin >> again;
+    return (again == 1);
+}
+
+/**
  * Entry point for the Battleships game.
  * Manages the outer play-again loop, player-select menu, ship placement,
- * turn-based firing, and win detection for a two-player local game.
+ * turn-based firing, and win detection for a two-player local game or a
+ * single-player game against the computer AI.
  * @return 0 on normal exit
  */
 int main() {
@@ -531,6 +644,8 @@ int main() {
 
             } else if (choice == 1) {
                 inputError = false;
+
+                // Set up the computer's grid and ships
                 char gameGridComputer[GRID_SIZE][GRID_SIZE];
                 initGrid(gameGridComputer);
                 assignComputerShips(gameGridComputer, 5);
@@ -538,7 +653,67 @@ int main() {
                 enterToContinue(5);
                 clearScreen();
 
+                // Set up the human player's grid and ships
+                char gameGridPlayer[GRID_SIZE][GRID_SIZE];
+                initGrid(gameGridPlayer);
+                assignShipPrompts(1, gameGridPlayer);
+                enterToContinue(5);
+                clearScreen();
 
+                // Tracking grids: what each side knows about the other
+                char playerTrackingGrid[GRID_SIZE][GRID_SIZE];
+                char computerTrackingGrid[GRID_SIZE][GRID_SIZE];
+                initGrid(playerTrackingGrid);
+                initGrid(computerTrackingGrid);
+
+                ComputerAI ai;
+
+                typewrite("Random player selection ...", 15);
+                int firstPlayer = whoGoesFirst(); // 1 = human, 2 = computer
+                string firstPrompt = (firstPlayer == 1) ? "You go first!" : "Computer goes first!";
+                typewrite(firstPrompt, 10);
+                enterToContinue(10);
+                clearScreen();
+
+                int currentTurn = firstPlayer;
+                bool gameOver = false;
+
+                while (!gameOver) {
+                    if (currentTurn == 1) {
+                        cout << "\n--- Your turn ---\n";
+                        cout << "Your tracking grid (shots fired at the computer):\n";
+                        displayGrid(playerTrackingGrid);
+
+                        fireAtGrid(gameGridComputer, playerTrackingGrid);
+
+                        cout << "\nYour updated tracking grid:\n";
+                        displayGrid(playerTrackingGrid);
+
+                        if (allShipsSunk(gameGridComputer)) {
+                            cout << "\n*** You win! All of the computer's ships have been sunk! ***\n";
+                            gameOver = true;
+                        }
+                    } else {
+                        cout << "\n--- Computer's turn ---\n";
+                        computerFireAtGrid(gameGridPlayer, computerTrackingGrid, ai);
+
+                        cout << "Ships you have lost so far: " << shipsSunkCount(ai) << " / 5\n";
+                        cout << "\nYour grid:\n";
+                        displayGrid(gameGridPlayer);
+
+                        if (allShipsSunk(gameGridPlayer)) {
+                            cout << "\n*** Computer wins! All of your ships have been sunk! ***\n";
+                            gameOver = true;
+                        }
+                    }
+
+                    if (!gameOver) {
+                        enterToContinue(10);
+                        clearScreen();
+                    }
+                    currentTurn = (currentTurn == 1) ? 2 : 1;
+                }
+                playAgain = playAgainFunc();
 
             } else if (choice == 2) {
                 inputError = false;
