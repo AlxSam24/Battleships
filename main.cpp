@@ -403,11 +403,10 @@ bool randomComputerShipOrientation() {
 
 void assignComputerShips (char gameGrid [GRID_SIZE][GRID_SIZE], int delayMS) {
     typewrite("Computer Assigning Ships ...", delayMS);
-    assignShip(gameGrid, "Carrier",     randomComputerShipYCoordinate(), randomComputerShipXCoordinate());
-    assignShip(gameGrid, "Battleship", randomComputerShipYCoordinate(), randomComputerShipXCoordinate());
-    assignShip(gameGrid, "Cruiser",    randomComputerShipYCoordinate(), randomComputerShipXCoordinate());
-    assignShip(gameGrid, "Submarine",  randomComputerShipYCoordinate(), randomComputerShipXCoordinate());
-    assignShip(gameGrid, "Destroyer",  randomComputerShipYCoordinate(), randomComputerShipXCoordinate());
+    placeShip(gameGrid, randomComputerShipColumn(), randomComputerShipRow(), 5, randomComputerShipOrientation(), 'C');
+    placeShip(gameGrid, randomComputerShipColumn(), randomComputerShipRow(), 4, randomComputerShipOrientation(), 'B');
+    placeShip(gameGrid, randomComputerShipColumn(), randomComputerShipRow(), 3, randomComputerShipOrientation(), 'R');
+    placeShip(gameGrid, randomComputerShipColumn(), randomComputerShipRow(), 2, randomComputerShipOrientation(), 'D');
     displayGrid(gameGrid);
     typewrite("Computer Ships Assigned ...", delayMS);
     enterToContinue(delayMS);
