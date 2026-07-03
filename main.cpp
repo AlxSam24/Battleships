@@ -470,7 +470,6 @@ int main() {
                 initGrid(gameGridComputer);
                 assignComputerShips(gameGridComputer, 5);
                 typewrite("Computer is ready!\n", 5);
-                displayGrid(gameGridComputer);
                 enterToContinue(5);
                 clearScreen();
 
