@@ -393,6 +393,13 @@ int randomComputerShipRow() {
     int random_coordinate = distribution(gen);
     return random_coordinate;
 }
+bool randomComputerShipOrientation() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::bernoulli_distribution distribution(0.5);
+    bool random_orientation = distribution(gen);
+    return random_orientation;
+}
 
 void assignComputerShips (char gameGrid [GRID_SIZE][GRID_SIZE], int delayMS) {
     typewrite("Computer Assigning Ships ...", delayMS);
