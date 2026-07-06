@@ -31,7 +31,8 @@ struct Ship {
 };
 
 /**
- * Clears the terminal screen.
+ * Clears the terminal screen using an ANSI escape sequence (portable across
+ * Windows/Linux/macOS terminals, unlike system("cls")).
  */
 void clearScreen() {
     cout << "\033[2J\033[1;1H";
@@ -132,20 +133,6 @@ void placeShip(char gameGrid[GRID_SIZE][GRID_SIZE], char col, int row, int size,
 }
 
 /**
- * Prints a message to standard output one character at a time with a configurable delay,
- * creating a typewriter effect.
- * @param message the string to print character by character
- * @param delayMs the delay in milliseconds between each character (default: 30)
- */
-void typewrite(const string& message, int delayMs = 30) {
-    for (char c : message) {
-        cout << c << flush;
-        this_thread::sleep_for(chrono::milliseconds(delayMs));
-    }
-    cout << "\n";
-}
-
-/**
  * Displays the current state of a grid to standard output.
  * Column headers are printed as letters (A–J) and row numbers as integers (1–10).
  * @param gameGrid the grid to display
@@ -206,12 +193,12 @@ void assignShip(char gameGrid[GRID_SIZE][GRID_SIZE], const string& shipName, int
 
     bool placed = false;
     while (!placed) {
-        typewrite("Enter start coordinate (e.g. A5): ",5);
+        cout << "Enter start coordinate (e.g. A5): ";
         string input;
         cin >> input;
 
         if (input.length() < 2) {
-            typewrite("Invalid input, please enter a coordinate like A5\n",5);
+            cout << "Invalid input, please enter a coordinate like A5\n";
             continue;
         }
 
@@ -223,17 +210,17 @@ void assignShip(char gameGrid[GRID_SIZE][GRID_SIZE], const string& shipName, int
             row = stoi(input.substr(1));
         } catch (...) {
             parseSuccess = false;
-            typewrite("Invalid input, please enter a coordinate like A5\n",5);
+            cout << "Invalid input, please enter a coordinate like A5\n";
         }
 
         if (!parseSuccess) continue;
 
         if (!isValidCoordinate(col, row)) {
-            typewrite("Invalid coordinate, column must be A-J and row must be 1-10\n",5);
+            cout << "Invalid coordinate, column must be A-J and row must be 1-10\n";
             continue;
         }
 
-        typewrite("Orientation - 1. Horizontal  2. Vertical: ",5);
+        cout << "Orientation - 1. Horizontal  2. Vertical: ";
         int orientChoice;
         if (!(cin >> orientChoice)) {
             cout << "Invalid choice, please enter 1 or 2\n";
@@ -259,8 +246,8 @@ void assignShip(char gameGrid[GRID_SIZE][GRID_SIZE], const string& shipName, int
                 : col;
             int endRow = horizontal ? row : row + size - 1;
 
-            typewrite(shipName + " placed from " + col + to_string(row)
-                 + " to " + endCol + to_string(endRow) + "\n",7);
+            cout << shipName << " placed from " << col << row
+                 << " to " << endCol << endRow << "\n";
 
             placeShip(gameGrid, col, row, size, horizontal, symbol);
             displayGrid(gameGrid);
@@ -269,6 +256,23 @@ void assignShip(char gameGrid[GRID_SIZE][GRID_SIZE], const string& shipName, int
     }
 }
 
+/**
+ * Guides a player through placing all five ships on their grid.
+ * Ships placed are: Carrier (5), Battleship (4), Cruiser (3), Submarine (3), Destroyer (2).
+ * @param playerNum the player number (1 or 2), used for display purposes
+ * @param gameGrid the player's grid on which all ships will be placed
+ */
+void assignShipPrompts(const int playerNum, char gameGrid[GRID_SIZE][GRID_SIZE]) {
+    cout << "Player " << playerNum << " - assign your ships\n";
+    displayGrid(gameGrid);
+    assignShip(gameGrid, "Carrier",    5, 'C');
+    assignShip(gameGrid, "Battleship", 4, 'B');
+    assignShip(gameGrid, "Cruiser",    3, 'R');
+    assignShip(gameGrid, "Submarine",  3, 'S');
+    assignShip(gameGrid, "Destroyer",  2, 'D');
+    cout << "\nAll ships placed. Player " << playerNum << " Ready to play!\n";
+    displayGrid(gameGrid);
+}
 
 /**
  * Randomly selects which player (1 or 2) takes the first turn.
@@ -283,32 +287,30 @@ int whoGoesFirst() {
 }
 
 /**
- * Guides a player through placing all five ships on their grid.
- * Ships placed are: Carrier (5), Battleship (4), Cruiser (3), Submarine (3), Destroyer (2).
- * @param playerNum the player number (1 or 2), used for display purposes
- * @param gameGrid the player's grid on which all ships will be placed
+ * Prints a message to standard output one character at a time with a configurable delay,
+ * creating a typewriter effect.
+ * @param message the string to print character by character
+ * @param delayMs the delay in milliseconds between each character (default: 30)
  */
-void assignShipPrompts(const int playerNum, char gameGrid[GRID_SIZE][GRID_SIZE], int delayMS) {
-    typewrite("Player " +  to_string(playerNum) + " - assign your ships\n", delayMS);
-    displayGrid(gameGrid);
-    assignShip(gameGrid, "Carrier",    5, 'C');
-    assignShip(gameGrid, "Battleship", 4, 'B');
-    assignShip(gameGrid, "Cruiser",    3, 'R');
-    assignShip(gameGrid, "Submarine",  3, 'S');
-    assignShip(gameGrid, "Destroyer",  2, 'D');
-    cout << "\nAll ships placed. Player " << playerNum << " Ready to play!\n";
-    displayGrid(gameGrid);
+void typewrite(const string& message, int delayMs = 30) {
+    for (char c : message) {
+        cout << c << flush;
+        this_thread::sleep_for(chrono::milliseconds(delayMs));
+    }
+    cout << "\n";
 }
 
 /**
  * Prompts the user to press Enter and then waits for them to do so.
+ * Clears any leftover newline left in the input buffer by a prior cin >> read
+ * before blocking on the user's actual next Enter press.
  * @param delayMs the delay in milliseconds used for the typewrite prompt
  */
 void enterToContinue(int delayMs) {
     typewrite("Press Enter to continue...", delayMs);
     cin.clear();
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');  // wait for user to press Enter
-    cin.get();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // discard leftover from prior input, if any
+    cin.get(); // now actually wait for the user's next Enter press
 }
 
 /**
@@ -418,7 +420,6 @@ void validateComputerShipAssignment(char gameGrid[GRID_SIZE][GRID_SIZE], char co
 
 void assignComputerShips(char gameGrid[GRID_SIZE][GRID_SIZE], int delayMS) {
     typewrite("Computer Assigning Ships ...", delayMS);
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     validateComputerShipAssignment(gameGrid, randomComputerShipColumn(), randomComputerShipRow(), 5, randomComputerShipOrientation(), 'C');
     validateComputerShipAssignment(gameGrid, randomComputerShipColumn(), randomComputerShipRow(), 4, randomComputerShipOrientation(), 'B');
     validateComputerShipAssignment(gameGrid, randomComputerShipColumn(), randomComputerShipRow(), 3, randomComputerShipOrientation(), 'R');
@@ -474,26 +475,6 @@ bool alreadyTried(char trackingGrid[GRID_SIZE][GRID_SIZE], int r, int c) {
 }
 
 /**
- * Queues the (up to four) orthogonal neighbours of a given cell as candidates
- * for the computer's next shots, skipping any that are off-grid or already fired at.
- * @param ai the computer AI state whose candidateQueue will be appended to
- * @param trackingGrid the computer's tracking grid, used to skip already-tried cells
- * @param row the row index (0-based) of the cell whose neighbours to queue
- * @param column the column index (0-based) of the cell whose neighbours to queue
- */
-void queueNeighbours(ComputerAI& ai, char trackingGrid[GRID_SIZE][GRID_SIZE], const int row, const int column) {
-    for (int i = 0; i < 4; i++) {
-        constexpr int deltaColumn[] = {0, 0, -1, 1};
-        constexpr int deltaRow[] = {-1, 1, 0, 0};
-        int neighbourRow = row + deltaRow[i];
-        if (int neighbourColumn = column + deltaColumn[i]; inBounds(neighbourRow, neighbourColumn)
-            && !alreadyTried(trackingGrid, neighbourRow, neighbourColumn)) {
-            ai.candidateQueue.emplace_back(neighbourRow, neighbourColumn);
-        }
-    }
-}
-
-/**
  * Looks up a ship target record by its grid placement symbol.
  * @param ai the computer AI state to search
  * @param symbol the ship's placement symbol (e.g. 'C', 'B', 'R', 'S', 'D')
@@ -504,6 +485,67 @@ ShipTarget* findShipBySymbol(ComputerAI& ai, char symbol) {
         if (ship.symbol == symbol) return &ship;
     }
     return nullptr;
+}
+
+/**
+ * Finds the still-unsunk ship target (if any) that owns a hit at the given cell.
+ * @param ai the computer AI state to search
+ * @param row the row index (0-based) of the hit cell
+ * @param column the column index (0-based) of the hit cell
+ * @return a pointer to the owning ShipTarget, or nullptr if none found
+ */
+ShipTarget* findShipOwningHit(ComputerAI& ai, int row, int column) {
+    for (auto& ship : ai.ships) {
+        if (ship.sunk) continue;
+        for (const auto& [r, c] : ship.hitCells) {
+            if (r == row && c == column) return &ship;
+        }
+    }
+    return nullptr;
+}
+
+/**
+ * Queues candidate cells around a freshly hit cell for the computer to try next.
+ * If the owning ship has two or more hits, this checks whether those hits share
+ * a row (horizontal ship) or column (vertical ship) and, if so, restricts the
+ * queued candidates to that axis only — avoiding wasted perpendicular shots
+ * once the ship's orientation is known.
+ * @param ai the computer AI state whose candidateQueue will be appended to
+ * @param trackingGrid the computer's tracking grid, used to skip already-tried cells
+ * @param row the row index (0-based) of the cell whose neighbours to queue
+ * @param column the column index (0-based) of the cell whose neighbours to queue
+ */
+void queueNeighbours(ComputerAI& ai, char trackingGrid[GRID_SIZE][GRID_SIZE], const int row, const int column) {
+    ShipTarget* activeShip = findShipOwningHit(ai, row, column);
+
+    bool restrictHorizontal = false; // ship confirmed running left-right: only queue left/right
+    bool restrictVertical = false;   // ship confirmed running up-down: only queue up/down
+
+    if (activeShip != nullptr && activeShip->hitCells.size() >= 2) {
+        bool sameRow = true, sameCol = true;
+        int r0 = activeShip->hitCells[0].first;
+        int c0 = activeShip->hitCells[0].second;
+        for (const auto& [r, c] : activeShip->hitCells) {
+            if (r != r0) sameRow = false;
+            if (c != c0) sameCol = false;
+        }
+        restrictHorizontal = sameRow;
+        restrictVertical = sameCol;
+    }
+
+    constexpr int deltaColumn[] = {0, 0, -1, 1};
+    constexpr int deltaRow[] = {-1, 1, 0, 0};
+
+    for (int i = 0; i < 4; i++) {
+        if (restrictHorizontal && deltaRow[i] != 0) continue;   // skip up/down
+        if (restrictVertical && deltaColumn[i] != 0) continue;  // skip left/right
+
+        int neighbourRow = row + deltaRow[i];
+        if (int neighbourColumn = column + deltaColumn[i]; inBounds(neighbourRow, neighbourColumn)
+            && !alreadyTried(trackingGrid, neighbourRow, neighbourColumn)) {
+            ai.candidateQueue.emplace_back(neighbourRow, neighbourColumn);
+        }
+    }
 }
 
 /**
@@ -534,10 +576,85 @@ int shipsSunkCount(const ComputerAI& ai) {
 }
 
 /**
+ * Builds a probability density grid for Hunt-mode targeting: for every still-
+ * unsunk ship, every legal horizontal and vertical placement (one that stays
+ * on the board and doesn't cross a known miss) adds +1 to every cell it would
+ * occupy. Cells that appear in more legal placements score higher, biasing
+ * shots toward the board centre and toward shapes consistent with the ships
+ * still afloat.
+ * @param ai the computer AI state, used to find still-unsunk ship lengths
+ * @param trackingGrid the computer's tracking grid, used to exclude known misses
+ * @param probabilityGrid output grid of per-cell placement counts
+ */
+void buildProbabilityGrid(const ComputerAI& ai, char trackingGrid[GRID_SIZE][GRID_SIZE],
+                           int probabilityGrid[GRID_SIZE][GRID_SIZE]) {
+    for (int r = 0; r < GRID_SIZE; r++) {
+        for (int c = 0; c < GRID_SIZE; c++) {
+            probabilityGrid[r][c] = 0;
+        }
+    }
+
+    for (const auto& ship : ai.ships) {
+        if (ship.sunk) continue;
+        int len = ship.length;
+
+        // Horizontal placements
+        for (int r = 0; r < GRID_SIZE; r++) {
+            for (int c = 0; c <= GRID_SIZE - len; c++) {
+                bool legal = true;
+                for (int i = 0; i < len && legal; i++) {
+                    if (trackingGrid[r][c + i] == 'O') legal = false;
+                }
+                if (legal) {
+                    for (int i = 0; i < len; i++) probabilityGrid[r][c + i]++;
+                }
+            }
+        }
+
+        // Vertical placements
+        for (int c = 0; c < GRID_SIZE; c++) {
+            for (int r = 0; r <= GRID_SIZE - len; r++) {
+                bool legal = true;
+                for (int i = 0; i < len && legal; i++) {
+                    if (trackingGrid[r + i][c] == 'O') legal = false;
+                }
+                if (legal) {
+                    for (int i = 0; i < len; i++) probabilityGrid[r + i][c]++;
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Picks the highest-scoring untried cell from a probability grid, for use as
+ * the computer's next Hunt-mode shot.
+ * @param trackingGrid the computer's tracking grid, used to skip already-tried cells
+ * @param probabilityGrid the probability density grid built by buildProbabilityGrid
+ * @return the (row, column) of the best untried cell to fire at
+ */
+pair<int, int> bestHuntCell(char trackingGrid[GRID_SIZE][GRID_SIZE],
+                             int probabilityGrid[GRID_SIZE][GRID_SIZE]) {
+    int bestScore = -1, bestR = 0, bestC = 0;
+    for (int r = 0; r < GRID_SIZE; r++) {
+        for (int c = 0; c < GRID_SIZE; c++) {
+            if (!alreadyTried(trackingGrid, r, c) && probabilityGrid[r][c] > bestScore) {
+                bestScore = probabilityGrid[r][c];
+                bestR = r;
+                bestC = c;
+            }
+        }
+    }
+    return {bestR, bestC};
+}
+
+/**
  * Performs one computer-controlled firing action against the human player's grid.
  * Uses a Hunt/Target state machine: if there are queued candidate cells near a
- * known, unsunk hit ("Target mode"), it fires at one of those; otherwise it
- * fires at a random untried cell restricted to checkerboard parity ("Hunt mode").
+ * known, unsunk hit ("Target mode"), it fires at one of those (restricted to
+ * the ship's known orientation once two aligned hits reveal it); otherwise it
+ * fires at the highest-scoring untried cell from a probability density grid
+ * built from all legal placements of the ships still afloat ("Hunt mode").
  * Tracks which specific ship was hit (by its placement symbol) so it can detect
  * when that ship has been fully sunk and purge stale queued leads accordingly.
  * @param opponentGrid the human player's game grid, updated in place on a hit or miss
@@ -563,12 +680,12 @@ bool computerFireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE],
     }
 
     if (rowIndex == -1) {
-        // HUNT MODE: random cell on checkerboard parity, not already tried
-        do {
-            rowIndex = randomComputerShipRow() - 1;
-            colIndex = randomComputerShipColumn() - 'a';
-        } while (alreadyTried(trackingGrid, rowIndex, colIndex)
-                 || (rowIndex + colIndex) % 2 != 0);
+        // HUNT MODE: fire at the highest-probability untried cell
+        static int probabilityGrid[GRID_SIZE][GRID_SIZE];
+        buildProbabilityGrid(ai, trackingGrid, probabilityGrid);
+        auto [bestR, bestC] = bestHuntCell(trackingGrid, probabilityGrid);
+        rowIndex = bestR;
+        colIndex = bestC;
     }
 
     char hitSymbol = opponentGrid[rowIndex][colIndex];   // capture BEFORE it gets overwritten
@@ -660,7 +777,7 @@ int main() {
                 // Set up the human player's grid and ships
                 char gameGridPlayer[GRID_SIZE][GRID_SIZE];
                 initGrid(gameGridPlayer);
-                assignShipPrompts(1, gameGridPlayer,5);
+                assignShipPrompts(1, gameGridPlayer);
                 enterToContinue(5);
                 clearScreen();
 
@@ -684,13 +801,13 @@ int main() {
 
                 while (!gameOver) {
                     if (currentTurn == 1) {
-                        typewrite("\n--- Your turn ---\n",5);
-                        typewrite("Your tracking grid (shots fired at the computer):\n",5);
+                        cout << "\n--- Your turn ---\n";
+                        cout << "Your tracking grid (shots fired at the computer):\n";
                         displayGrid(playerTrackingGrid);
 
                         fireAtGrid(gameGridComputer, playerTrackingGrid);
 
-                        typewrite("\nYour updated tracking grid:\n",5);
+                        cout << "\nYour updated tracking grid:\n";
                         displayGrid(playerTrackingGrid);
 
                         if (allShipsSunk(gameGridComputer)) {
@@ -698,9 +815,7 @@ int main() {
                             gameOver = true;
                         }
                     } else {
-                        typewrite("\n--- Computer's turn ---\n",5);
-                        typewrite("Computer Thinking ... \n",5);
-                        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+                        cout << "\n--- Computer's turn ---\n";
                         computerFireAtGrid(gameGridPlayer, computerTrackingGrid, ai);
 
                         cout << "Ships you have lost so far: " << shipsSunkCount(ai) << " / 5\n";
@@ -725,14 +840,14 @@ int main() {
                 inputError = false;
                 char gameGridPlayerOne[GRID_SIZE][GRID_SIZE];
                 initGrid(gameGridPlayerOne);
-                assignShipPrompts(1, gameGridPlayerOne,5);
+                assignShipPrompts(1, gameGridPlayerOne);
                 typewrite("Pass Over to Player 2 to assign ships!\n", 5);
                 enterToContinue(5);
                 clearScreen();
 
                 char gameGridPlayerTwo[GRID_SIZE][GRID_SIZE];
                 initGrid(gameGridPlayerTwo);
-                assignShipPrompts(2, gameGridPlayerTwo,5);
+                assignShipPrompts(2, gameGridPlayerTwo);
                 typewrite("Pass the computer back to Player 1!\n", 5);
                 enterToContinue(5);
                 clearScreen();
