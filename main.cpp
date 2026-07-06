@@ -206,12 +206,12 @@ void assignShip(char gameGrid[GRID_SIZE][GRID_SIZE], const string& shipName, int
 
     bool placed = false;
     while (!placed) {
-        cout << "Enter start coordinate (e.g. A5): ";
+        typewrite("Enter start coordinate (e.g. A5): ",5);
         string input;
         cin >> input;
 
         if (input.length() < 2) {
-            cout << "Invalid input, please enter a coordinate like A5\n";
+            typewrite("Invalid input, please enter a coordinate like A5\n",5);
             continue;
         }
 
@@ -223,17 +223,17 @@ void assignShip(char gameGrid[GRID_SIZE][GRID_SIZE], const string& shipName, int
             row = stoi(input.substr(1));
         } catch (...) {
             parseSuccess = false;
-            cout << "Invalid input, please enter a coordinate like A5\n";
+            typewrite("Invalid input, please enter a coordinate like A5\n",5);
         }
 
         if (!parseSuccess) continue;
 
         if (!isValidCoordinate(col, row)) {
-            cout << "Invalid coordinate, column must be A-J and row must be 1-10\n";
+            typewrite("Invalid coordinate, column must be A-J and row must be 1-10\n",5);
             continue;
         }
 
-        cout << "Orientation - 1. Horizontal  2. Vertical: ";
+        typewrite("Orientation - 1. Horizontal  2. Vertical: ",5);
         int orientChoice;
         if (!(cin >> orientChoice)) {
             cout << "Invalid choice, please enter 1 or 2\n";
@@ -306,7 +306,9 @@ void assignShipPrompts(const int playerNum, char gameGrid[GRID_SIZE][GRID_SIZE],
  */
 void enterToContinue(int delayMs) {
     typewrite("Press Enter to continue...", delayMs);
+    cin.clear();
     cin.ignore(numeric_limits<streamsize>::max(), '\n');  // wait for user to press Enter
+    cin.get();
 }
 
 /**
