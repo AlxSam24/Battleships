@@ -799,6 +799,8 @@ int main() {
                 char gameGridComputer[GRID_SIZE][GRID_SIZE];
                 initGrid(gameGridComputer);
                 assignComputerShips(gameGridComputer, 5);
+                typewrite("Computer is thinking ...\n");
+                this_thread::sleep_for(chrono::milliseconds(1500));
                 typewrite("Computer is ready!\n", 5);
                 enterToContinue(5);
                 clearScreen();
