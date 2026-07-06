@@ -132,6 +132,20 @@ void placeShip(char gameGrid[GRID_SIZE][GRID_SIZE], char col, int row, int size,
 }
 
 /**
+ * Prints a message to standard output one character at a time with a configurable delay,
+ * creating a typewriter effect.
+ * @param message the string to print character by character
+ * @param delayMs the delay in milliseconds between each character (default: 30)
+ */
+void typewrite(const string& message, int delayMs = 30) {
+    for (char c : message) {
+        cout << c << flush;
+        this_thread::sleep_for(chrono::milliseconds(delayMs));
+    }
+    cout << "\n";
+}
+
+/**
  * Displays the current state of a grid to standard output.
  * Column headers are printed as letters (A–J) and row numbers as integers (1–10).
  * @param gameGrid the grid to display
@@ -142,7 +156,7 @@ void displayGrid(char gameGrid[GRID_SIZE][GRID_SIZE]) {
         cout << (r + 1);
         if (r + 1 < 10) cout << " ";
         for (int c = 0; c < GRID_SIZE; c++) {
-            cout << " " << gameGrid[r][c];
+            typewrite(" " + gameGrid[r][c], 5);
         }
         cout << "\n";
     }
@@ -255,23 +269,6 @@ void assignShip(char gameGrid[GRID_SIZE][GRID_SIZE], const string& shipName, int
     }
 }
 
-/**
- * Guides a player through placing all five ships on their grid.
- * Ships placed are: Carrier (5), Battleship (4), Cruiser (3), Submarine (3), Destroyer (2).
- * @param playerNum the player number (1 or 2), used for display purposes
- * @param gameGrid the player's grid on which all ships will be placed
- */
-void assignShipPrompts(const int playerNum, char gameGrid[GRID_SIZE][GRID_SIZE]) {
-    cout << "Player " << playerNum << " - assign your ships\n";
-    displayGrid(gameGrid);
-    assignShip(gameGrid, "Carrier",    5, 'C');
-    assignShip(gameGrid, "Battleship", 4, 'B');
-    assignShip(gameGrid, "Cruiser",    3, 'R');
-    assignShip(gameGrid, "Submarine",  3, 'S');
-    assignShip(gameGrid, "Destroyer",  2, 'D');
-    cout << "\nAll ships placed. Player " << playerNum << " Ready to play!\n";
-    displayGrid(gameGrid);
-}
 
 /**
  * Randomly selects which player (1 or 2) takes the first turn.
@@ -286,17 +283,21 @@ int whoGoesFirst() {
 }
 
 /**
- * Prints a message to standard output one character at a time with a configurable delay,
- * creating a typewriter effect.
- * @param message the string to print character by character
- * @param delayMs the delay in milliseconds between each character (default: 30)
+ * Guides a player through placing all five ships on their grid.
+ * Ships placed are: Carrier (5), Battleship (4), Cruiser (3), Submarine (3), Destroyer (2).
+ * @param playerNum the player number (1 or 2), used for display purposes
+ * @param gameGrid the player's grid on which all ships will be placed
  */
-void typewrite(const string& message, int delayMs = 30) {
-    for (char c : message) {
-        cout << c << flush;
-        this_thread::sleep_for(chrono::milliseconds(delayMs));
-    }
-    cout << "\n";
+void assignShipPrompts(const int playerNum, char gameGrid[GRID_SIZE][GRID_SIZE], int delayMS) {
+    typewrite("Player " +  to_string(playerNum) + " - assign your ships\n", delayMS);
+    displayGrid(gameGrid);
+    assignShip(gameGrid, "Carrier",    5, 'C');
+    assignShip(gameGrid, "Battleship", 4, 'B');
+    assignShip(gameGrid, "Cruiser",    3, 'R');
+    assignShip(gameGrid, "Submarine",  3, 'S');
+    assignShip(gameGrid, "Destroyer",  2, 'D');
+    cout << "\nAll ships placed. Player " << playerNum << " Ready to play!\n";
+    displayGrid(gameGrid);
 }
 
 /**
@@ -657,7 +658,7 @@ int main() {
                 // Set up the human player's grid and ships
                 char gameGridPlayer[GRID_SIZE][GRID_SIZE];
                 initGrid(gameGridPlayer);
-                assignShipPrompts(1, gameGridPlayer);
+                assignShipPrompts(1, gameGridPlayer,5);
                 enterToContinue(5);
                 clearScreen();
 
@@ -722,14 +723,14 @@ int main() {
                 inputError = false;
                 char gameGridPlayerOne[GRID_SIZE][GRID_SIZE];
                 initGrid(gameGridPlayerOne);
-                assignShipPrompts(1, gameGridPlayerOne);
+                assignShipPrompts(1, gameGridPlayerOne,5);
                 typewrite("Pass Over to Player 2 to assign ships!\n", 5);
                 enterToContinue(5);
                 clearScreen();
 
                 char gameGridPlayerTwo[GRID_SIZE][GRID_SIZE];
                 initGrid(gameGridPlayerTwo);
-                assignShipPrompts(2, gameGridPlayerTwo);
+                assignShipPrompts(2, gameGridPlayerTwo,5);
                 typewrite("Pass the computer back to Player 1!\n", 5);
                 enterToContinue(5);
                 clearScreen();
