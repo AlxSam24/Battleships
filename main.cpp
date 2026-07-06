@@ -749,7 +749,7 @@ bool computerFireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE],
             if (ship->hitsTaken >= ship->length) {
                 ship->sunk = true;
                 ostringstream sunkMsg;
-                sunkMsg = ostringstream(checkDestroyedShip(ship->length));
+                sunkMsg = ostringstream(checkDestroyedShip(ship->length, 1));
                 typewrite(sunkMsg.str(), 5);
                 rebuildCandidateQueue(ai, trackingGrid);
             } else {
