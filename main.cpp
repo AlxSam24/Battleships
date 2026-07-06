@@ -259,8 +259,8 @@ void assignShip(char gameGrid[GRID_SIZE][GRID_SIZE], const string& shipName, int
                 : col;
             int endRow = horizontal ? row : row + size - 1;
 
-            cout << shipName << " placed from " << col << row
-                 << " to " << endCol << endRow << "\n";
+            typewrite(shipName + " placed from " + col + to_string(row)
+                 + " to " + endCol + to_string(endRow) + "\n",7);
 
             placeShip(gameGrid, col, row, size, horizontal, symbol);
             displayGrid(gameGrid);
