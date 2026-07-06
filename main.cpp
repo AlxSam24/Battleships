@@ -673,18 +673,30 @@ pair<int, int> bestHuntCell(char trackingGrid[GRID_SIZE][GRID_SIZE],
     return {bestR, bestC};
 }
 
-string checkDestroyedShip (const int shipLength, int playerNum) {
-    if (shipLength == 5) {
+string checkDestroyedShip (const int shipLength, int playerNum, bool isComputer) {
+    if (shipLength == 5 && !isComputer) {
         return  to_string(playerNum) + " sank your battleship (length 5)!";
     }
-    if (shipLength == 4) {
+    if (shipLength == 5 && isComputer) {
+        return "Computer sank your battleship (length 5)!";
+    }
+    if (shipLength == 4 && !isComputer) {
         return to_string(playerNum) + " sank your cruiser (length 4)!";
     }
-    if (shipLength == 3) {
+    if (shipLength == 4 && isComputer) {
+        return "Computer sank your cruiser (length 4)!";
+    }
+    if (shipLength == 3 && !isComputer) {
         return to_string (playerNum) + " sank your submarine (length 3)!";
     }
-    if (shipLength == 2) {
+    if (shipLength == 3 && isComputer) {
+        return "Computer sank your submarine (length 3)!";
+    }
+    if (shipLength == 2 && !isComputer) {
         return to_string(playerNum) + " sank your destroyer (length 2)!";
+    }
+    if (shipLength == 2 && isComputer) {
+        return "Computer sank your destroyer (length 2)!";
     }
     return "Error detecting destroyed ship report error to developers";
 }
