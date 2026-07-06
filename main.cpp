@@ -14,6 +14,7 @@
 #include <vector>
 #include <algorithm>
 #include <iomanip>
+#include <sstream>
 using namespace std;
 
 constexpr int GRID_SIZE = 10;
@@ -37,6 +38,11 @@ struct Ship {
 void clearScreen() {
     cout << "\033[2J\033[1;1H";
 }
+
+// Forward declaration: typewrite is defined later in the file but used by
+// several functions (assignShip, assignShipPrompts, etc.) defined earlier.
+// Default arguments live here only — the definition below must not repeat them.
+void typewrite(const string& message, int delayMs = 30, bool newline = true);
 
 /**
  * Checks whether a given row number is within the valid grid range (1–10).
@@ -189,16 +195,18 @@ bool allShipsSunk(char grid[GRID_SIZE][GRID_SIZE]) {
  * @param symbol the character used to represent the ship on the grid
  */
 void assignShip(char gameGrid[GRID_SIZE][GRID_SIZE], const string& shipName, int size, char symbol) {
-    cout << "\nAssign your " << shipName << " (size " << size << ")\n";
+    ostringstream headerMsg;
+    headerMsg << "\nAssign your " << shipName << " (size " << size << ")";
+    typewrite(headerMsg.str(), 5);
 
     bool placed = false;
     while (!placed) {
-        cout << "Enter start coordinate (e.g. A5): ";
+        typewrite("Enter start coordinate (e.g. A5): ", 5, false);
         string input;
         cin >> input;
 
         if (input.length() < 2) {
-            cout << "Invalid input, please enter a coordinate like A5\n";
+            typewrite("Invalid input, please enter a coordinate like A5", 5);
             continue;
         }
 
@@ -210,44 +218,46 @@ void assignShip(char gameGrid[GRID_SIZE][GRID_SIZE], const string& shipName, int
             row = stoi(input.substr(1));
         } catch (...) {
             parseSuccess = false;
-            cout << "Invalid input, please enter a coordinate like A5\n";
+            typewrite("Invalid input, please enter a coordinate like A5", 5);
         }
 
         if (!parseSuccess) continue;
 
         if (!isValidCoordinate(col, row)) {
-            cout << "Invalid coordinate, column must be A-J and row must be 1-10\n";
+            typewrite("Invalid coordinate, column must be A-J and row must be 1-10", 5);
             continue;
         }
 
-        cout << "Orientation - 1. Horizontal  2. Vertical: ";
+        typewrite("Orientation - 1. Horizontal  2. Vertical: ", 5, false);
         int orientChoice;
         if (!(cin >> orientChoice)) {
-            cout << "Invalid choice, please enter 1 or 2\n";
+            typewrite("Invalid choice, please enter 1 or 2", 5);
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             continue;
         }
 
         if (orientChoice != 1 && orientChoice != 2) {
-            cout << "Invalid choice, please enter 1 or 2\n";
+            typewrite("Invalid choice, please enter 1 or 2", 5);
             continue;
         }
 
         bool horizontal = (orientChoice == 1);
 
         if (!shipFits(col, row, size, horizontal)) {
-            cout << "Ship does not fit on the grid from that position, please try again\n";
+            typewrite("Ship does not fit on the grid from that position, please try again", 5);
         } else if (!noOverlap(gameGrid, col, row, size, horizontal)) {
-            cout << "Ship overlaps an existing ship, please try again\n";
+            typewrite("Ship overlaps an existing ship, please try again", 5);
         } else {
             char endCol = horizontal
                 ? static_cast<char>('A' + (col - 'A') + size - 1)
                 : col;
             int endRow = horizontal ? row : row + size - 1;
 
-            cout << shipName << " placed from " << col << row
-                 << " to " << endCol << endRow << "\n";
+            ostringstream placedMsg;
+            placedMsg << shipName << " placed from " << col << row
+                      << " to " << endCol << endRow;
+            typewrite(placedMsg.str(), 5);
 
             placeShip(gameGrid, col, row, size, horizontal, symbol);
             displayGrid(gameGrid);
@@ -263,14 +273,18 @@ void assignShip(char gameGrid[GRID_SIZE][GRID_SIZE], const string& shipName, int
  * @param gameGrid the player's grid on which all ships will be placed
  */
 void assignShipPrompts(const int playerNum, char gameGrid[GRID_SIZE][GRID_SIZE]) {
-    cout << "Player " << playerNum << " - assign your ships\n";
+    ostringstream startMsg;
+    startMsg << "Player " << playerNum << " - assign your ships";
+    typewrite(startMsg.str(), 5);
     displayGrid(gameGrid);
     assignShip(gameGrid, "Carrier",    5, 'C');
     assignShip(gameGrid, "Battleship", 4, 'B');
     assignShip(gameGrid, "Cruiser",    3, 'R');
     assignShip(gameGrid, "Submarine",  3, 'S');
     assignShip(gameGrid, "Destroyer",  2, 'D');
-    cout << "\nAll ships placed. Player " << playerNum << " Ready to play!\n";
+    ostringstream doneMsg;
+    doneMsg << "\nAll ships placed. Player " << playerNum << " Ready to play!";
+    typewrite(doneMsg.str(), 5);
     displayGrid(gameGrid);
 }
 
@@ -291,13 +305,18 @@ int whoGoesFirst() {
  * creating a typewriter effect.
  * @param message the string to print character by character
  * @param delayMs the delay in milliseconds between each character (default: 30)
+ * @param newline whether to print a trailing newline after the message (default: true).
+ *                Pass false for inline prompts immediately followed by a cin read,
+ *                so the user's typed input stays on the same visual line.
  */
-void typewrite(const string& message, int delayMs = 30) {
+void typewrite(const string& message, int delayMs, bool newline) {
     for (char c : message) {
         cout << c << flush;
         this_thread::sleep_for(chrono::milliseconds(delayMs));
     }
-    cout << "\n";
+    if (newline) {
+        cout << "\n";
+    }
 }
 
 /**
@@ -308,6 +327,7 @@ void typewrite(const string& message, int delayMs = 30) {
  */
 void enterToContinue(int delayMs) {
     typewrite("Press Enter to continue...", delayMs);
+    cin.clear();
     cin.ignore(numeric_limits<streamsize>::max(), '\n'); // discard leftover from prior input, if any
     cin.get(); // now actually wait for the user's next Enter press
 }
@@ -330,12 +350,12 @@ bool fireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE], char trackingGrid[GRID_
             cerr << "\nError: ran out of input\n";
             exit(1);
         }
-        cout << "Enter target coordinate (e.g. A5): ";
+        typewrite("Enter target coordinate (e.g. A5): ", 5, false);
         string input;
         cin >> input;
 
         if (input.length() < 2) {
-            cout << "Invalid input, please enter a coordinate like A5\n";
+            typewrite("Invalid input, please enter a coordinate like A5", 5);
             continue;
         }
 
@@ -347,13 +367,13 @@ bool fireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE], char trackingGrid[GRID_
             row = stoi(input.substr(1));
         } catch (...) {
             parseSuccess = false;
-            cout << "Invalid input, please enter a coordinate like A5\n";
+            typewrite("Invalid input, please enter a coordinate like A5", 5);
         }
 
         if (!parseSuccess) continue;
 
         if (!isValidCoordinate(col, row)) {
-            cout << "Invalid coordinate, column must be A-J and row must be 1-10\n";
+            typewrite("Invalid coordinate, column must be A-J and row must be 1-10", 5);
             continue;
         }
 
@@ -361,19 +381,25 @@ bool fireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE], char trackingGrid[GRID_
         int rowIndex = row - 1;
 
         if (trackingGrid[rowIndex][colIndex] == 'X' || trackingGrid[rowIndex][colIndex] == 'O') {
-            cout << "You have already fired at " << col << row << ", choose another coordinate\n";
+            ostringstream alreadyMsg;
+            alreadyMsg << "You have already fired at " << col << row << ", choose another coordinate";
+            typewrite(alreadyMsg.str(), 5);
             continue;
         }
 
         // Fresh shot — check the opponent's ORIGINAL grid
         if (opponentGrid[rowIndex][colIndex] != '~') {   // anything not water = ship
-            cout << "HIT at " << col << row << "!\n";
+            ostringstream hitMsg;
+            hitMsg << "HIT at " << col << row << "!";
+            typewrite(hitMsg.str(), 5);
             trackingGrid[rowIndex][colIndex] = 'X';
             opponentGrid[rowIndex][colIndex] = 'X';
 
             isHit = true;
         } else {
-            cout << "MISS at " << col << row << ".\n";
+            ostringstream missMsg;
+            missMsg << "MISS at " << col << row << ".";
+            typewrite(missMsg.str(), 5);
             trackingGrid[rowIndex][colIndex] = 'O';
             opponentGrid[rowIndex][colIndex] = 'O';
         }
@@ -693,8 +719,10 @@ bool computerFireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE],
     trackingGrid[rowIndex][colIndex] = mark;
     opponentGrid[rowIndex][colIndex] = mark;
 
-    cout << "Computer fires at " << static_cast<char>('A' + colIndex)
-         << (rowIndex + 1) << " - " << (isHit ? "HIT!" : "MISS.") << "\n";
+    ostringstream fireMsg;
+    fireMsg << "Computer fires at " << static_cast<char>('A' + colIndex)
+             << (rowIndex + 1) << " - " << (isHit ? "HIT!" : "MISS.");
+    typewrite(fireMsg.str(), 5);
 
     if (isHit) {
         ShipTarget* ship = findShipBySymbol(ai, hitSymbol);
@@ -704,7 +732,9 @@ bool computerFireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE],
 
             if (ship->hitsTaken >= ship->length) {
                 ship->sunk = true;
-                cout << "Computer sank your ship (length " << ship->length << ")!\n";
+                ostringstream sunkMsg;
+                sunkMsg << "Computer sank your ship (length " << ship->length << ")!";
+                typewrite(sunkMsg.str(), 5);
                 rebuildCandidateQueue(ai, trackingGrid);
             } else {
                 queueNeighbours(ai, trackingGrid, rowIndex, colIndex);
@@ -800,29 +830,31 @@ int main() {
 
                 while (!gameOver) {
                     if (currentTurn == 1) {
-                        cout << "\n--- Your turn ---\n";
-                        cout << "Your tracking grid (shots fired at the computer):\n";
+                        typewrite("\n--- Your turn ---", 5);
+                        typewrite("Your tracking grid (shots fired at the computer):", 5);
                         displayGrid(playerTrackingGrid);
 
                         fireAtGrid(gameGridComputer, playerTrackingGrid);
 
-                        cout << "\nYour updated tracking grid:\n";
+                        typewrite("\nYour updated tracking grid:", 5);
                         displayGrid(playerTrackingGrid);
 
                         if (allShipsSunk(gameGridComputer)) {
-                            cout << "\n*** You win! All of the computer's ships have been sunk! ***\n";
+                            typewrite("\n*** You win! All of the computer's ships have been sunk! ***", 10);
                             gameOver = true;
                         }
                     } else {
-                        cout << "\n--- Computer's turn ---\n";
+                        typewrite("\n--- Computer's turn ---", 5);
                         computerFireAtGrid(gameGridPlayer, computerTrackingGrid, ai);
 
-                        cout << "Ships you have lost so far: " << shipsSunkCount(ai) << " / 5\n";
-                        cout << "\nYour grid:\n";
+                        ostringstream lostMsg;
+                        lostMsg << "Ships you have lost so far: " << shipsSunkCount(ai) << " / 5";
+                        typewrite(lostMsg.str(), 5);
+                        typewrite("\nYour grid:", 5);
                         displayGrid(gameGridPlayer);
 
                         if (allShipsSunk(gameGridPlayer)) {
-                            cout << "\n*** Computer wins! All of your ships have been sunk! ***\n";
+                            typewrite("\n*** Computer wins! All of your ships have been sunk! ***", 10);
                             gameOver = true;
                         }
                     }
@@ -873,8 +905,10 @@ int main() {
                     char* myTrackingGrid = (currentPlayer == 1)
                         ? &trackingGridOne[0][0]   : &trackingGridTwo[0][0];
 
-                    cout << "\n--- Player " << currentPlayer << "'s turn ---\n";
-                    cout << "Your tracking grid:\n";
+                    ostringstream turnMsg;
+                    turnMsg << "\n--- Player " << currentPlayer << "'s turn ---";
+                    typewrite(turnMsg.str(), 5);
+                    typewrite("Your tracking grid:", 5);
                     displayGrid(reinterpret_cast<char(*)[GRID_SIZE]>(myTrackingGrid));
 
                     fireAtGrid(
@@ -882,12 +916,14 @@ int main() {
                         reinterpret_cast<char(*)[GRID_SIZE]>(myTrackingGrid)
                     );
 
-                    cout << "\nYour updated tracking grid:\n";
+                    typewrite("\nYour updated tracking grid:", 5);
                     displayGrid(reinterpret_cast<char(*)[GRID_SIZE]>(myTrackingGrid));
 
                     if (allShipsSunk(reinterpret_cast<char(*)[GRID_SIZE]>(opponentGrid))) {
-                        cout << "\n*** Player " << currentPlayer << " wins! All of Player "
-                             << opponent << "'s ships have been sunk! ***\n";
+                        ostringstream winMsg;
+                        winMsg << "\n*** Player " << currentPlayer << " wins! All of Player "
+                               << opponent << "'s ships have been sunk! ***";
+                        typewrite(winMsg.str(), 10);
                         playerWon = true;
                     }
 
@@ -901,7 +937,7 @@ int main() {
 
             } else {
                 inputError = true;
-                cout << "Invalid input, please enter 1 (Yes) or 2 (No)\n";
+                typewrite("Invalid input, please enter 1 (Yes) or 2 (No)", 10);
                 cin.clear();
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
             }
