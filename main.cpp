@@ -846,8 +846,9 @@ int main() {
                             gameOver = true;
                         }
                     } else {
-                        typewrite("\n--- Computer's turn ---", 5);
+                        typewrite("\nComputer's turn ...", 5);
                         computerFireAtGrid(gameGridPlayer, computerTrackingGrid, ai);
+                        this_thread::sleep_for(chrono::milliseconds(1200));
 
                         ostringstream lostMsg;
                         lostMsg << "Ships you have lost so far: " << shipsSunkCount(ai) << " / 5";
