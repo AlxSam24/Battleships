@@ -733,7 +733,15 @@ bool computerFireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE],
             if (ship->hitsTaken >= ship->length) {
                 ship->sunk = true;
                 ostringstream sunkMsg;
-                sunkMsg << "Computer sank your ship (length " << ship->length << ")!";
+                if (ship ->length == 5) {
+                    sunkMsg << "Computer sank your battleship (length 5)!";
+                } else if (ship -> length == 4) {
+                    sunkMsg << "Computer sank your cruiser (length 4)!";
+                } else if (ship -> length == 3) {
+                    sunkMsg << "Computer sank your submarine (length 3)!";
+                } else if (ship -> length == 2) {
+                    sunkMsg << "Computer sank your destroyer (length 2)!";
+                }
                 typewrite(sunkMsg.str(), 5);
                 rebuildCandidateQueue(ai, trackingGrid);
             } else {
