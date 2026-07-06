@@ -156,7 +156,7 @@ void displayGrid(char gameGrid[GRID_SIZE][GRID_SIZE]) {
         cout << (r + 1);
         if (r + 1 < 10) cout << " ";
         for (int c = 0; c < GRID_SIZE; c++) {
-            typewrite(" " + gameGrid[r][c], 5);
+            cout << " " << gameGrid[r][c];
         }
         cout << "\n";
     }
