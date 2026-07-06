@@ -696,6 +696,8 @@ int main() {
                         }
                     } else {
                         cout << "\n--- Computer's turn ---\n";
+                        cout << "Computer Thinking ... \n";
+                        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
                         computerFireAtGrid(gameGridPlayer, computerTrackingGrid, ai);
 
                         cout << "Ships you have lost so far: " << shipsSunkCount(ai) << " / 5\n";
