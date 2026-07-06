@@ -682,13 +682,13 @@ int main() {
 
                 while (!gameOver) {
                     if (currentTurn == 1) {
-                        cout << "\n--- Your turn ---\n";
-                        cout << "Your tracking grid (shots fired at the computer):\n";
+                        typewrite("\n--- Your turn ---\n",5);
+                        typewrite("Your tracking grid (shots fired at the computer):\n",5);
                         displayGrid(playerTrackingGrid);
 
                         fireAtGrid(gameGridComputer, playerTrackingGrid);
 
-                        cout << "\nYour updated tracking grid:\n";
+                        typewrite("\nYour updated tracking grid:\n",5);
                         displayGrid(playerTrackingGrid);
 
                         if (allShipsSunk(gameGridComputer)) {
@@ -696,8 +696,8 @@ int main() {
                             gameOver = true;
                         }
                     } else {
-                        cout << "\n--- Computer's turn ---\n";
-                        cout << "Computer Thinking ... \n";
+                        typewrite("\n--- Computer's turn ---\n",5);
+                        typewrite("Computer Thinking ... \n",5);
                         std::this_thread::sleep_for(std::chrono::milliseconds(1500));
                         computerFireAtGrid(gameGridPlayer, computerTrackingGrid, ai);
 
