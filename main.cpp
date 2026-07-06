@@ -673,6 +673,22 @@ pair<int, int> bestHuntCell(char trackingGrid[GRID_SIZE][GRID_SIZE],
     return {bestR, bestC};
 }
 
+string checkDestroyedShip (const int shipLength) {
+    if (shipLength == 5) {
+        return "Computer sank your battleship (length 5)!";
+    }
+    if (shipLength == 4) {
+        return "Computer sank your cruiser (length 4)!";
+    }
+    if (shipLength == 3) {
+        return "Computer sank your submarine (length 3)!";
+    }
+    if (shipLength == 2) {
+        return "Computer sank your destroyer (length 2)!";
+    }
+    return "Error detecting destroyed ship report error to developers";
+}
+
 /**
  * Performs one computer-controlled firing action against the human player's grid.
  * Uses a Hunt/Target state machine: if there are queued candidate cells near a
