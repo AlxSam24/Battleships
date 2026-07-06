@@ -673,18 +673,18 @@ pair<int, int> bestHuntCell(char trackingGrid[GRID_SIZE][GRID_SIZE],
     return {bestR, bestC};
 }
 
-string checkDestroyedShip (const int shipLength) {
+string checkDestroyedShip (const int shipLength, int playerNum) {
     if (shipLength == 5) {
-        return "Computer sank your battleship (length 5)!";
+        return  to_string(playerNum) + " sank your battleship (length 5)!";
     }
     if (shipLength == 4) {
-        return "Computer sank your cruiser (length 4)!";
+        return to_string(playerNum) + " sank your cruiser (length 4)!";
     }
     if (shipLength == 3) {
-        return "Computer sank your submarine (length 3)!";
+        return to_string (playerNum) + " sank your submarine (length 3)!";
     }
     if (shipLength == 2) {
-        return "Computer sank your destroyer (length 2)!";
+        return to_string(playerNum) + " sank your destroyer (length 2)!";
     }
     return "Error detecting destroyed ship report error to developers";
 }
@@ -749,15 +749,7 @@ bool computerFireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE],
             if (ship->hitsTaken >= ship->length) {
                 ship->sunk = true;
                 ostringstream sunkMsg;
-                if (ship ->length == 5) {
-                    sunkMsg << "Computer sank your battleship (length 5)!";
-                } else if (ship -> length == 4) {
-                    sunkMsg << "Computer sank your cruiser (length 4)!";
-                } else if (ship -> length == 3) {
-                    sunkMsg << "Computer sank your submarine (length 3)!";
-                } else if (ship -> length == 2) {
-                    sunkMsg << "Computer sank your destroyer (length 2)!";
-                }
+                sunkMsg = ostringstream(checkDestroyedShip(ship->length));
                 typewrite(sunkMsg.str(), 5);
                 rebuildCandidateQueue(ai, trackingGrid);
             } else {
@@ -767,21 +759,6 @@ bool computerFireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE],
     }
 
     return isHit;
-}
-string checkDestroyedShip (const int shipLength) {
-    if (shipLength == 5) {
-        return "Computer sank your battleship (length 5)!";
-    }
-    if (shipLength == 4) {
-        return "Computer sank your cruiser (length 4)!";
-    }
-    if (shipLength == 3) {
-        return "Computer sank your submarine (length 3)!";
-    }
-    if (shipLength == 2) {
-        return "Computer sank your destroyer (length 2)!";
-    }
-        return "Error detecting destroyed ship report error to developers";
 }
 
 /**
