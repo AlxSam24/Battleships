@@ -19,6 +19,11 @@ using namespace std;
 
 constexpr int GRID_SIZE = 10;
 
+/**
+ * Represents the known state of a single grid cell from an observer's
+ * perspective (currently unused by the rest of the code, which tracks
+ * cell state directly via char markers on the grid instead).
+ */
 enum CellState {
     UNKNOWN,
     HIT,
@@ -26,6 +31,11 @@ enum CellState {
     SUNK,
 };
 
+/**
+ * Simple record of a ship's length and whether it has been sunk
+ * (currently unused by the rest of the code, which tracks ship state
+ * via the ShipTarget struct instead).
+ */
 struct Ship {
     int length;
     bool isSunk;
@@ -410,6 +420,12 @@ bool fireAtGrid(char opponentGrid[GRID_SIZE][GRID_SIZE], char trackingGrid[GRID_
     return isHit;
 }
 
+/**
+ * Generates a random column character for the computer's ship placement.
+ * Note: returns a lowercase letter ('a'-'j'), which callers such as
+ * shipFits/noOverlap/placeShip normalise to uppercase internally.
+ * @return a random column character in the range 'a' to 'j'
+ */
 char randomComputerShipColumn() {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -418,6 +434,10 @@ char randomComputerShipColumn() {
     return random_coordinate;
 }
 
+/**
+ * Generates a random row number for the computer's ship placement.
+ * @return a random row number in the range 1 to GRID_SIZE inclusive
+ */
 int randomComputerShipRow() {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -426,6 +446,11 @@ int randomComputerShipRow() {
     return random_coordinate;
 }
 
+/**
+ * Randomly chooses an orientation for the computer's ship placement,
+ * with equal probability of horizontal or vertical.
+ * @return true for horizontal, false for vertical
+ */
 bool randomComputerShipOrientation() {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -434,6 +459,17 @@ bool randomComputerShipOrientation() {
     return random_orientation;
 }
 
+/**
+ * Places a computer ship on the grid, re-rolling a fresh random column, row,
+ * and orientation as many times as needed until the placement both fits on
+ * the grid and does not overlap an existing ship.
+ * @param gameGrid the computer's grid on which to place the ship
+ * @param col the initial candidate starting column character
+ * @param row the initial candidate starting row number
+ * @param size the length of the ship
+ * @param horizontal the initial candidate orientation (true = horizontal, false = vertical)
+ * @param symbol the character used to represent this ship on the grid
+ */
 void validateComputerShipAssignment(char gameGrid[GRID_SIZE][GRID_SIZE], char col, int row, int size, bool horizontal, char symbol) {
     while (!shipFits(col, row, size, horizontal) || !noOverlap(gameGrid, col, row, size, horizontal)) {
         col = randomComputerShipColumn();
@@ -443,6 +479,12 @@ void validateComputerShipAssignment(char gameGrid[GRID_SIZE][GRID_SIZE], char co
     placeShip(gameGrid, col, row, size, horizontal, symbol);
 }
 
+/**
+ * Randomly places all five of the computer's ships on its grid.
+ * Ships placed are: Carrier (5), Battleship (4), Cruiser (3), Submarine (3), Destroyer (2).
+ * @param gameGrid the computer's grid on which all ships will be placed
+ * @param delayMS the delay in milliseconds used for the typewrite prompt
+ */
 void assignComputerShips(char gameGrid[GRID_SIZE][GRID_SIZE], int delayMS) {
     typewrite("Computer Assigning Ships ...", delayMS);
     validateComputerShipAssignment(gameGrid, randomComputerShipColumn(), randomComputerShipRow(), 5, randomComputerShipOrientation(), 'C');
@@ -673,6 +715,15 @@ pair<int, int> bestHuntCell(char trackingGrid[GRID_SIZE][GRID_SIZE],
     return {bestR, bestC};
 }
 
+/**
+ * Builds the announcement message for a ship that has just been sunk,
+ * selecting wording based on the ship's length and whether the sinking
+ * player was the computer or a human player.
+ * @param shipLength the length of the ship that was sunk (5, 4, 3, or 2)
+ * @param playerNum the number of the human player who sank the ship, used when isComputer is false
+ * @param isComputer true if the computer sank the ship, false if a human player did
+ * @return a message describing which ship was sunk and by whom
+ */
 string checkDestroyedShip (const int shipLength, int playerNum, bool isComputer) {
     if (shipLength == 5 && !isComputer) {
         return  to_string(playerNum) + " sank your battleship (length 5)!";
