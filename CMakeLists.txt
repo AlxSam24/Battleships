@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD 20)
 # Main game executable
 # -------------------------------------------------------
 add_executable(Battleships main.cpp
+        Game.cpp
 )
 
 # -------------------------------------------------------
