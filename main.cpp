@@ -2,7 +2,7 @@
  * Currently the main class of battleships.
  * This is the basic version of the battleships game.
  * This version is the simplest version of the game.
- * @version 2.0
+ * @version 3.0
  * @author Alex Samuel
  */
 #include <iostream>
