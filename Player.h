@@ -22,5 +22,7 @@ class HumanPlayer: public Player {
 class ComputerPlayer : public Player {
     void placeShips() override;
     Coordinate chooseTarget(...) override;
+private:
+    TargetingAI ai_;
 };
 #endif
