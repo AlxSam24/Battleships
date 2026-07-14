@@ -4,6 +4,7 @@
 
 #ifndef BATTLESHIPS_COORDINATE_H
 #define BATTLESHIPS_COORDINATE_H
+#include <string>
 
 
 class Coordinate {
