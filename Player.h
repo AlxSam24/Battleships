@@ -19,5 +19,8 @@ class HumanPlayer: public Player {
     void placeShips() override;
     Coordinate chooseTarget(...) override;
 };
-
+class ComputerPlayer : public Player {
+    void placeShips() override;
+    Coordinate chooseTarget(...) override;
+};
 #endif
