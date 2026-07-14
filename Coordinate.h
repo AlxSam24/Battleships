@@ -8,6 +8,13 @@
 
 
 class Coordinate {
+public:
+    Coordinate(char col, int row);
+    bool isValid() const;
+    int rowIndex() const;
+    char colIndex() const;
+    static bool tryParse(const string& input, Coordinate& out);
+    friend ostream& operator<<(ostream&, const Coordinate&);
 };
 
 
