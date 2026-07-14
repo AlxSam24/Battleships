@@ -15,5 +15,9 @@ protected:
     Grid trackingGrid_;
     Fleet fleet_;
 };
+class HumanPlayer: public Player {
+    void placeShips() override;
+    Coordinate chooseTarget(...) override;
+};
 
 #endif
