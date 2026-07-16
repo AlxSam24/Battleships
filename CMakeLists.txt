@@ -12,6 +12,8 @@ add_executable(Battleships main.cpp
         Coordinate.cpp
         Coordinate.h
         Player.cpp
+        Ship.cpp
+        Ship.h
 )
 
 # -------------------------------------------------------
