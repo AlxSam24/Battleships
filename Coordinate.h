@@ -14,7 +14,7 @@ public:
     Coordinate(char col, int row);
     bool isValidRow() const;
     bool isValidCol();
-    bool isValid() const;
+    bool isValid();
     int getRow() const;
     char getCol() const;
     static bool tryParse(const string& input, Coordinate& out);
