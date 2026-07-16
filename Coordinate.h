@@ -15,6 +15,10 @@ public:
     char colIndex() const;
     static bool tryParse(const string& input, Coordinate& out);
     friend ostream& operator<<(ostream&, const Coordinate&);
+
+private:
+    char col;
+    int row;
 };
 
 
