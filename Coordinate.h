@@ -12,7 +12,7 @@ using namespace std;
 class Coordinate {
 public:
     Coordinate(char col, int row);
-    bool isValidRow();
+    bool isValidRow() const;
     bool isValidCol();
     bool isValid() const;
     int getRow() const;
