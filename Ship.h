@@ -4,6 +4,9 @@
 
 #ifndef BATTLESHIPS_SHIP_H
 #define BATTLESHIPS_SHIP_H
+#include <string>
+#include <iostream>
+using namespace std;
 
 
 class Ship {
