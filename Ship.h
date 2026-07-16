@@ -10,6 +10,18 @@ using namespace std;
 
 
 class Ship {
+public:
+    Ship(string name, int length, char symbol);
+    void registerHit();
+    bool isSunk() const;
+    int length() const;
+    char symbol() const;
+    string name() const;
+private:
+    string name_;
+    int length_;
+    char symbol_;
+    int hitsTaken =0;
 };
 
 
