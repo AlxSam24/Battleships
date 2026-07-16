@@ -10,6 +10,8 @@
 class Coordinate {
 public:
     Coordinate(char col, int row);
+    bool isValidRow(int row);
+    bool isValidCol(int col);
     bool isValid() const;
     int getRow() const;
     char getCol() const;
