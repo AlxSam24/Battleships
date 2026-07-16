@@ -5,6 +5,8 @@
 #ifndef BATTLESHIPS_COORDINATE_H
 #define BATTLESHIPS_COORDINATE_H
 #include <string>
+#include <ostream>
+using namespace std;
 
 
 class Coordinate {
